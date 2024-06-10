@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMap.name }}
+data:
+  APP.NAME: "{{ .Values.configMap.data.appName }}"
+  APP.PORT: "{{ .Values.configMap.data.appPort }}"
+  APP.ENV: "{{ .Values.configMap.data.environment }}"
+  APP.VERSION: "{{ .Values.configMap.data.version }}"
+
+  DB.HOST: "{{ .Values.configMap.data.dbHost }}"
+  DB.PORT: "{{ .Values.configMap.data.dbPort }}"
+  DB.NAME: "{{ .Values.configMap.data.dbNane }}"
+  DB.USER: "{{ .Values.configMap.data.dbUser }}"
+  DB.PASS: "{{ .Values.configMap.data.dbPass }}"
+  DB.TYPE: "{{ .Values.configMap.data.dbType }}"
+
+  KC.REALM: "{{ .Values.configMap.data.kcRealm }}"
+  KC.CLIENT_ID: "{{ .Values.configMap.data.kcClientId }}"
+  KC.BASE_URL: "{{ .Values.configMap.data.kcBaseUrl }}"
+
+  SENTRY_DSN: "{{ .Values.configMap.data.sentryDsn }}"
+  SENTRY_LOGGING_ENABLED: "{{ .Values.configMap.data.sentryLoggingEnabled }}"
+
+  PAYSTACK.BASE_URL: {{ .Values.configMap.data.paystackBaseUrl }}"
+  PAYSTACK.PUBLIC_KEY: "{{ .Values.configMap.data.paystackPublicKey }}"
+  PAYSTACK.SECRET_KEY: "{{ .Values.configMap.data.paystackSecretKey }}"
+
+  AZ.SB.CONNECTION_STRING: "{{ .Values.configMap.data.azureConnectionString }}"

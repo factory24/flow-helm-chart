@@ -1,0 +1,82 @@
+deployment:
+  name: billing-service
+  replicaCount: 1
+  restartPolicy: Always
+  image:
+    repository: athari/billing-service
+    tag: latest
+    pullPolicy: Never
+
+service:
+  name: billing-service
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  #  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+virtualService:
+  name: billing-service
+  host: api.hydrate.local
+  gateway: api-gateway
+  routePrefix: /v1/billing
+  destinationHost: billing-service.default.svc.cluster.local
+  destinationPort: 8080
+  healthCheckPath: /health
+
+configMap:
+  name: billing-service
+  data:
+    appName: "Flow Report Service"
+    appPort: "8080"
+    environment: "production"
+    dbHost: "gf-db-flowbox-p-we.postgres.database.azure.com"
+    dbPort: "5432"
+    dbUser: "athari"
+    dbPass: "Futur3lab2@22"
+    dbType: "postgres"
+    dbNane: "flow_flowbox_reports_db"
+    kcClientId: "flow"
+    kcRealm: "flow-web"
+    kcBaseUrl: "https://accounts.everyflow.org"
+    azureConnectionString: "Endpoint=sb://gf-sb-flowbox-p-azwe.servicebus.windows.net/;SharedAccessKeyName=microservice;SharedAccessKey=WjaZPQAhDp/qvnet9L7P0W4riRJAY5JPq+ASbJPqST8="
+    paystackBaseUrl: "https://api.paystack.co"
+    paystackPublicKey: "pk_test_29602966fca43c074bb153cbe2c0e31e5ab63dc5"
+    paystackSecretKey: "sk_test_eba64be5d9d7c59f2d5dadb097427fa97c21104d"
+
+certificate:
+  enabled: false
+  name: "flow"
+  namespace: istio-system
+  secretName: "flow"
+  issuerRef: letsencrypt
+  commonName: dev.everyflow.org
+  dnsNames: {}
+
+gateway:
+  enabled: false
+  name: "flow"
+  namespace: istio-system
+  specSelector: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: http
+      hosts:
+        - "dev.everyflow.org"
+      tls:
+        httpsRedirect: false

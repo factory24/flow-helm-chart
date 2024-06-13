@@ -9,8 +9,8 @@ spec:
   issuerRef:
     name: {{ .Values.certificate.issuerRef }}
   commonName: {{ .Values.certificate.commonName }}
-  dnsNames: |-
+  dnsNames:
     {{- range .Values.certificate.dnsNames }}
     - {{ . }}
-    {{- end }}  
+    {{- end }}
 {{- end -}}

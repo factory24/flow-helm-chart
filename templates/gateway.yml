@@ -6,13 +6,13 @@ metadata:
   namespace: {{ .Values.gateway.namespace }}
 spec:
   selector:
-    istio: ingressgateway
+    istio: {{ .Values.gateway.specSelector }}
   servers: |-
     {{- range .Values.gateway.servers }}
     - port: {{ .port.name }}
         number: {{ .port.number }}
         protocol: {{ .port.protocol | upper }}
-      hosts: |-
+      hosts:
       {{ range .hosts }}
         {{ . | quote }}
       {{- end }}

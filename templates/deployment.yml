@@ -19,6 +19,7 @@ spec:
         - name: {{ .Values.deployment.name }}
           image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
+          {{ if .Values.resources.enabled }}
           resources:
             limits:
               cpu: {{ .Values.resources.limits.cpu }}
@@ -26,7 +27,16 @@ spec:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
               memory: {{ .Values.resources.requests.memory }}
+          {{- end }}
+          {{ if or (.Values.configMap.enabled) (.Values.secrets.enabled) }}
           envFrom:
+          {{ if .Values.configMap.enabled}}
             - configMapRef:
                 name: {{ .Values.configMap.name }}
+            {{ if .Values.secrets.enabled }}
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
       restartPolicy: {{ .Values.deployment.restartPolicy}}

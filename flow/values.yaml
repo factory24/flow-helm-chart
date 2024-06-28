@@ -52,19 +52,28 @@ certificate:
   dnsNames: { }
 
 gateway:
-  enabled: true
-  name: "flow"
-  namespace: istio-system
+  enabled: true  # Enable the Gateway deployment
+  name: my-istio-gateway  # Name for the Gateway resource
+  namespace: istio-ingress  # Namespace where the Gateway will be deployed
   specSelector: ingressgateway
   servers:
     - port:
         number: 80
         name: http
-        protocol: http
+        protocol: HTTP
       hosts:
-        - "dev.everyflow.org"
+        - "1flow.org"
       tls:
-        httpsRedirect: false
+        httpsRedirect: true
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "1flow.org"
+      tls:
+        mode: SIMPLE
+        credentialName: flow-landing-tls
 
 virtualService:
   enabled: true
@@ -78,8 +87,8 @@ virtualService:
   healthCheckPath: /health
   allowOrigins:
     exact: "https://1flow.org"
-#    prefix: "/v1"
-#    regex: ""
+  #    prefix: "/v1"
+  #    regex: ""
   allowHeaders:
     - Content-Type
     - Authorization

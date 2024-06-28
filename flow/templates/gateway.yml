@@ -13,7 +13,7 @@ spec:
         number: {{ .port.number }}
         name: {{ .port.name }}
         protocol: {{ .port.protocol | upper }}
-      host:
+      hosts:
         {{ range .hosts }}
           - {{ . | quote }}
         {{ end }}

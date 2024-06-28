@@ -77,7 +77,9 @@ virtualService:
   destinationPort: 8080
   healthCheckPath: /health
   allowOrigins:
-    - exact: "*"
+    exact: "https://1flow.org"
+#    prefix: "/v1"
+#    regex: ""
   allowHeaders:
     - Content-Type
     - Authorization

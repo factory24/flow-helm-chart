@@ -21,7 +21,9 @@ spec:
               number: {{ .Values.virtualService.destinationPort }}
       corsPolicy:
         allowOrigins:
-          - exact: "*"
+          {{- range $k, $v := .Values.virtualService.allowOrigins }}
+          - {{ $k }}: {{ $v | quote }}
+              {{- end }}
         allowHeaders:
           {{ range .Values.virtualService.allowHeaders }}
           - {{ . | quote }}

@@ -20,6 +20,7 @@ helm install card-service flow-helm-chart
 ```yaml
 deployment:
   name: billing-service
+  namespace: default
   replicaCount: 1
   restartPolicy: Always
   image:
@@ -30,6 +31,8 @@ deployment:
 service:
   name: billing-service
   type: ClusterIP
+  namespace: default
+  protocol: TCP
   port: 8080
   targetPort: 8080
 
@@ -50,10 +53,12 @@ autoscaling:
 configMap:
   enabled: true
   name: billing-service
+  namespace: default
   data: { }
 
 secrets:
   enabled: true
+  namespace: default
   name: flow
   data: { }
 
@@ -85,6 +90,7 @@ virtualService:
   enabled: true
   name: billing-service
   host: api.hydrate.local
+  namespace: default
   gateway: api-gateway
   routePrefix: /v1/billing
   destinationHost: billing-service.default.svc.cluster.local
@@ -100,4 +106,6 @@ virtualService:
     - POST
     - PUT
     - PATCH
+
+
 ```

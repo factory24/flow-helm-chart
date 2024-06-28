@@ -12,10 +12,10 @@ spec:
     - port:
         number: {{ .port.number }}
         name: {{ .port.name }}
-        protocol: {{ .port.protocol }}
+        protocol: {{ .port.protocol | upper }}
       host:
         {{ range .hosts }}
-        - {{ . }}
+          - {{ . | quote }}
         {{ end }}
       {{ if .tls}}
       tls:

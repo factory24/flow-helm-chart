@@ -60,7 +60,7 @@ gateway:
     - port:
         number: 80
         name: http
-        protocol: HTTP
+        protocol: http
       hosts:
         - "1flow.org"
       tls:
@@ -68,7 +68,7 @@ gateway:
     - port:
         number: 443
         name: https
-        protocol: HTTPS
+        protocol: https
       hosts:
         - "1flow.org"
       tls:

@@ -84,7 +84,7 @@ virtualService:
   host: api.hydrate.local
   namespace: default
   gateway: api-gateway
-  routes:
+  routeDefinitions:
     - /v1/billing
   destinationHost: billing-service.default.svc.cluster.local
   destinationPort: 8080

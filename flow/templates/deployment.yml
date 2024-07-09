@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.deployment.name }}
-          image: {{ .Values.deployment.image.repository }}:{{ .Chart.Version}}
+          image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           {{ if .Values.resources.enabled }}
           resources:

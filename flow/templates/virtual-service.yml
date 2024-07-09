@@ -12,9 +12,9 @@ spec:
   http:
     - name: {{ .Values.virtualService.name }}
       match:
-        {{ range .Values.virtualService.routes }}
+        {{ range $index, $element := .Values.virtualService.routeDefinitions }}
         - uri:
-            prefix: {{ . }}
+            prefix: {{ $element }}
         {{- end }}
       route:
         - destination:

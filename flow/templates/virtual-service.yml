@@ -12,8 +12,10 @@ spec:
   http:
     - name: {{ .Values.virtualService.name }}
       match:
+        {{ range .Values.virtualService.routes }}
         - uri:
-            prefix: {{ .Values.virtualService.routePrefix }}
+            prefix: {{ . }}
+        {{- end }}
       route:
         - destination:
             host: {{ .Values.virtualService.destinationHost }}

@@ -27,7 +27,7 @@ spec:
         {{ end }}
         {{ if .tls.httpsRedirect }}
         httpsRedirect: {{ .tls.httpsRedirect }}
-        {{ end }}
+        {{- end }}
       {{- end -}}
     {{- end -}}
 {{ end }}

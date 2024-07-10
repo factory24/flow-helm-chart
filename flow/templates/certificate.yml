@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.certificate.name }}
   namespace: {{ .Values.certificate.namespace }}
 spec:
-  secretName: flow-dev-tls
+  secretName: {{ .Values.certificate.secretName }}
   issuerRef:
     name: {{ .Values.certificate.issuerRef }}
   commonName: {{ .Values.certificate.commonName }}

@@ -23,7 +23,7 @@ spec:
               number: {{ .Values.virtualService.destinationPort }}
       corsPolicy:
         allowOrigins:
-          - exact: "*"
+          - exact: {{ .Values.virtualService.allowOrigins.exact | quote }}
         allowHeaders:
           {{ range .Values.virtualService.allowHeaders }}
           - {{ . | quote }}

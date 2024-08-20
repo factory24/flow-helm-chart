@@ -6,10 +6,16 @@ deployment:
   namespace: default
   replicaCount: 1
   restartPolicy: Always
+  args: []
   image:
     repository: athari/billing-service
     tag: latest
     pullPolicy: Never
+  ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+
 
 service:
   name: billing-service

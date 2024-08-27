@@ -1,0 +1,146 @@
+argocd:
+  name: 'flow'
+  enabled: false
+  namespace: 'default'
+  projectName: ''
+  sources: [ ]
+  sync:
+    automated:
+      prune: 'true'
+      selfHeal: 'true'
+    options:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - Validate=false
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+    retry:
+      limit: '2'
+      backoffDuration: '5s'
+      backOffMaxDuration: '3m0s'
+      backOffFactor: '2'
+  destination:
+    name: 'william'
+    namespace: 'default'
+    server: 'https://kubernetes.default.svc'
+  repository:
+    url: 'https://factory24.github.io/flow-helm-chart/'
+    path: ''
+    targetRevision: '0.1.12'
+    chart: 'flow-helm-chart'
+    valueFiles:
+      - values.yaml
+      - values.yaml
+      - values.yaml
+      - values.yaml
+      - values.yaml
+      - values.yaml
+      - values.yaml
+      - values.yaml
+  values: |
+    deployment:
+      name: billing-service
+      namespace: default
+      replicaCount: 1
+      restartPolicy: Always
+      args: []
+      image:
+        repository: athari/billing-service
+        tag: latest
+        pullPolicy: Never
+      ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+
+
+    service:
+      name: billing-service
+      type: ClusterIP
+      namespace: default
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+    resources:
+      enabled: true
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+
+    configMap:
+      enabled: true
+      name: billing-service
+      namespace: default
+      data: { }
+
+    secrets:
+      enabled: false
+      namespace: default
+      name: flow
+      data: { }
+
+    certificate:
+      enabled: false
+      name: "flow"
+      namespace: istio-system
+      secretName: "flow"
+      issuerRef: letsencrypt
+      commonName: dev.everyflow.org
+      dnsNames: { }
+
+    gateway:
+      enabled: false  # Enable the Gateway deployment
+      name: my-istio-gateway  # Name for the Gateway resource
+      namespace: istio-ingress  # Namespace where the Gateway will be deployed
+      specSelector: ingressgateway
+      servers:
+        - port:
+            number: 80
+            name: http
+            protocol: http
+          hosts:
+            - "1flow.org"
+        - port:
+            number: 443
+            name: https
+            protocol: https
+          hosts:
+            - "1flow.org"
+          tls:
+            mode: SIMPLE
+            credentialName: keycloak-tls
+
+    virtualService:
+      enabled: true
+      name: billing-service
+      host: api.hydrate.local
+      namespace: default
+      gateway: api-gateway
+      routeDefinitions:
+        - /v1/billing
+      destinationHost: billing-service.default.svc.cluster.local
+      destinationPort: 8080
+      healthCheckPath: /health
+      allowOrigins:
+        exact: "*"
+      allowHeaders:
+        - Content-Type
+        - Authorization
+      allowMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+    
+    
+

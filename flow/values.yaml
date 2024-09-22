@@ -134,9 +134,9 @@ persistentVolumeClaim:
   storage: 16Gi
 
 argocd:
-  name: 'flow'
+  name: ' '
   enabled: true
-  namespace: 'flow'
+  namespace: ' '
   projectName: 'flow-production'
   sources: [ ]
   sync:

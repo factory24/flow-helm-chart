@@ -1,18 +1,12 @@
-namespace:
-  name: ''
-  create: false
-  enabled: false
-
 deployment:
-  name: ''
-  enabled: false
-  namespace: ''
+  name: fraud-service
+  namespace: flow
   replicaCount: 1
   restartPolicy: Always
-  args: { }
+  args: []
   image:
-    repository: ''
-    tag: ''
+    repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
+    tag: latest
     pullPolicy: Always
   ports:
     - name: http
@@ -20,8 +14,7 @@ deployment:
       protocol: TCP
 
 service:
-  name: ''
-  enabled: false
+  name: fraud-service
   type: ClusterIP
   namespace: flow
   protocol: TCP
@@ -31,117 +24,260 @@ service:
 resources:
   enabled: true
   limits:
-    cpu: ''
-    memory: ''
+    cpu: 100m
+    memory: 128Mi
   requests:
-    cpu: ''
-    memory: ''
+    cpu: 100m
+    memory: 128Mi
 
 autoscaling:
   enabled: false
   minReplicas: 1
-  maxReplicas: 5
+  maxReplicas: 10
 
 configMap:
-  enabled: false
-  name: ''
-  namespace: ''
-  data: { }
+  enabled: true
+  name: fraud-service
+  namespace: flow
+  data:
+    DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
+    DB.PORT: "5432"
+    DB.NAME: "hydrate_aqm_fraud_p_db"
+    DB.USER: "hydrate"
+    DB.PASS: "ujy5azp.xrn3CMV0get"
+    KC.REALM: "hydrate"
+    KC.BASE_URL: "https://accounts.hydrate.net/auth"
+    EUREKA_ENABLED: "false"
+    EUREKA_ZONE_URL: ""
+    EUREKA_PREFER_IP: "false"
+    EUREKA_REGISTER: "false"
+    EUREKA_FETCH_REGISTRY: "false"
 
 secrets:
-  name: ''
-  namespace: ''
   enabled: false
+  namespace: default
+  name: flow
   data: { }
 
 certificate:
   enabled: false
-  name: ''
-  namespace: ''
-  secretName: ''
-  issuerRef: ''
-  commonName: ''
+  name: "flow"
+  namespace: istio-system
+  secretName: "flow"
+  issuerRef: letsencrypt
+  commonName: dev.everyflow.org
   dnsNames: { }
 
 gateway:
   enabled: false
-  name: ''
-  namespace: ''
-  specSelector: ''
+  name: my-istio-gateway
+  namespace: istio-ingress
+  specSelector: ingressgateway
   servers:
     - port:
         number: 80
         name: http
         protocol: http
       hosts:
-        - '*'
+        - "1flow.org"
     - port:
         number: 443
         name: https
         protocol: https
       hosts:
-        - '*'
+        - "1flow.org"
       tls:
         mode: SIMPLE
-        credentialName: ''
+        credentialName: keycloak-tls
 
 virtualService:
-  enabled: false
-  name: ''
-  host: ''
-  namespace: ''
-  gateway: ''
-  routeDefinitions: { }
-  destinationHost: ''
-  destinationPort: ''
-  healthCheckPath: ''
+  enabled: true
+  name: fraud-service
+  host: api.hydrate.local
+  namespace: flow
+  gateway: hydrate-gateway
+  routeDefinitions:
+    - /v1/fraud
+  destinationHost: fraud-service.athari-dev.svc.cluster.local
+  destinationPort: 8080
+  healthCheckPath: /health
   allowOrigins:
     exact: "*"
-  allowHeaders: { }
-  allowMethods: { }
+  allowHeaders:
+    - Content-Type
+    - Authorization
+  allowMethods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
 
 persistentVolume:
   enabled: false
-  name: ''
-  namespace: ''
+  name: bizops
+  namespace: default
   labelType: ''
   storage:
-    className: ''
-    capacity: ''
-  accessModes: { }
-  hostPath: ''
+    className: 'default'
+    capacity: '10Gi'
+  accessModes:
+    - ReadWriteOnce
+  hostPath: '/mnt/data'
 
 persistentVolumeClaim:
-  name: ''
-  namespace: ''
+  name: bizopsclaim
+  namespace: default
   enabled: false
-  accessModes: { }
-  storage: ''
+  accessModes:
+    - ReadWriteOnce
+  storage: 16Gi
 
 argocd:
-  name: ''
-  enabled: false
-  namespace: ''
-  projectName: ''
-  sources: { }
+  name: ' '
+  enabled: true
+  namespace: ' '
+  projectName: 'flow-production'
+  sources: [ ]
   sync:
     automated:
-      prune: 'false'
-      selfHeal: 'false'
-    options: { }
+      prune: 'true'
+      selfHeal: 'true'
+    options:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - Validate=false
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
     retry:
-      limit: ''
-      backoffDuration: ''
-      backOffMaxDuration: ''
-      backOffFactor: ''
+      limit: '2'
+      backoffDuration: '5s'
+      backOffMaxDuration: '3m0s'
+      backOffFactor: '2'
   destination:
     name: ''
-    namespace: ''
-    server: ''
+    namespace: 'flow'
+    server: 'https://kubernetes.default.svc'
   repository:
-    url: ''
+    url: 'https://factory24.github.io/flow-helm-chart/'
     path: ''
-    targetRevision: '0.1.13'
+    targetRevision: '0.1.12'
     chart: 'flow-helm-chart'
-    valueFiles: { }
-  values: ''
+    valueFiles:
+      - values.yaml
+  values: |
+    deployment:
+      name: fraud-service
+      namespace: flow
+      replicaCount: 1
+      restartPolicy: Always
+      args: []
+      image:
+        repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
+        tag: latest
+        pullPolicy: Always
+      ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+
+    service:
+      name: fraud-service
+      type: ClusterIP
+      namespace: flow
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+    resources:
+      enabled: true
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+
+    configMap:
+      enabled: true
+      name: fraud-service
+      namespace: flow
+      data:
+        DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
+        DB.PORT: "5432"
+        DB.NAME: "hydrate_aqm_fraud_p_db"
+        DB.USER: "hydrate"
+        DB.PASS: "ujy5azp.xrn3CMV0get"
+        KC.REALM: "hydrate"
+        KC.BASE_URL: "https://accounts.hydrate.net/auth"
+        EUREKA_ENABLED: "false"
+        EUREKA_ZONE_URL: ""
+        EUREKA_PREFER_IP: "false"
+        EUREKA_REGISTER: "false"
+        EUREKA_FETCH_REGISTRY: "false"
+
+    secrets:
+      enabled: false
+      namespace: default
+      name: flow
+      data: { }
+
+    certificate:
+      enabled: false
+      name: "flow"
+      namespace: istio-system
+      secretName: "flow"
+      issuerRef: letsencrypt
+      commonName: dev.everyflow.org
+      dnsNames: { }
+
+    gateway:
+      enabled: false  # Enable the Gateway deployment
+      name: my-istio-gateway  # Name for the Gateway resource
+      namespace: istio-ingress  # Namespace where the Gateway will be deployed
+      specSelector: ingressgateway
+      servers:
+        - port:
+            number: 80
+            name: http
+            protocol: http
+          hosts:
+            - "1flow.org"
+        - port:
+            number: 443
+            name: https
+            protocol: https
+          hosts:
+            - "1flow.org"
+          tls:
+            mode: SIMPLE
+            credentialName: keycloak-tls
+
+    virtualService:
+      enabled: true
+      name: fraud-service
+      host: api.hydrate.local
+      namespace: flow
+      gateway: hydrate-gateway
+      routeDefinitions:
+        - /v1/fraud
+      destinationHost: fraud-service.athari-dev.svc.cluster.local
+      destinationPort: 8080
+      healthCheckPath: /health
+      allowOrigins:
+        exact: "*"
+      allowHeaders:
+        - Content-Type
+        - Authorization
+      allowMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE

@@ -32,9 +32,10 @@ service:
   name: billing-service
   type: ClusterIP
   namespace: default
-  protocol: TCP
-  port: 8080
-  targetPort: 8080
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
 
 resources:
   enabled: true

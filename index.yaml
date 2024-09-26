@@ -1,34 +1,34 @@
 apiVersion: v1
 entries:
   flow-helm-chart:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2024-09-27T15:49:48.848911Z"
-    description: A Helm chart for Kubernetes
-    digest: 1a1adf43ca0693f0f8563e8806beb24c38bdcc7b6e4fe98784833198fc33389f
-    name: flow-helm-chart
-    type: application
-    urls:
-    - flow-helm-chart-0.1.16.tgz
-    version: 0.1.16
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2024-09-27T15:49:48.848347Z"
-    description: A Helm chart for Kubernetes
-    digest: 0fa98b88f7eb4c6d7e8e55ebea89f8e29a326af051cef2a92d15de5c8648ad58
-    name: flow-helm-chart
-    type: application
-    urls:
-    - flow-helm-chart-0.1.15.tgz
-    version: 0.1.15
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2024-09-27T15:49:48.847627Z"
-    description: A Helm chart for Kubernetes
-    digest: 70e15d69083e3f7f34a7c9cf6211f5cb3b0c5a6e40dd01cb5d7de3c825384b31
-    name: flow-helm-chart
-    type: application
-    urls:
-    - flow-helm-chart-0.1.14.tgz
-    version: 0.1.14
+    - apiVersion: v2
+      appVersion: 1.16.0
+      created: "2024-09-27T15:49:48.848911Z"
+      description: A Helm chart for Kubernetes
+      digest: 1a1adf43ca0693f0f8563e8806beb24c38bdcc7b6e4fe98784833198fc33389f
+      name: flow-helm-chart
+      type: application
+      urls:
+        - flow-helm-chart-0.1.16.tgz
+      version: 0.1.16
+    - apiVersion: v2
+      appVersion: 1.16.0
+      created: "2024-09-27T15:49:48.848347Z"
+      description: A Helm chart for Kubernetes
+      digest: 0fa98b88f7eb4c6d7e8e55ebea89f8e29a326af051cef2a92d15de5c8648ad58
+      name: flow-helm-chart
+      type: application
+      urls:
+        - flow-helm-chart-0.1.15.tgz
+      version: 0.1.15
+    - apiVersion: v2
+      appVersion: 1.16.0
+      created: "2024-09-27T15:49:48.847627Z"
+      description: A Helm chart for Kubernetes
+      digest: 70e15d69083e3f7f34a7c9cf6211f5cb3b0c5a6e40dd01cb5d7de3c825384b31
+      name: flow-helm-chart
+      type: application
+      urls:
+        - flow-helm-chart-0.1.14.tgz
+      version: 0.1.14
 generated: "2024-09-27T15:49:48.845316Z"

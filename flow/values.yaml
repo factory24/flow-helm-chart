@@ -3,7 +3,7 @@ deployment:
   namespace: flow
   replicaCount: 1
   restartPolicy: Always
-  args: []
+  args: [ ]
   image:
     repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
     tag: latest
@@ -17,9 +17,10 @@ service:
   name: fraud-service
   type: ClusterIP
   namespace: flow
-  protocol: TCP
-  port: 8080
-  targetPort: 8080
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
 
 resources:
   enabled: true

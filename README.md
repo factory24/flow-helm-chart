@@ -34,6 +34,7 @@ service:
   namespace: default
   ports:
     - port: 8080
+      name: http
       targetPort: 8080
       protocol: TCP
 

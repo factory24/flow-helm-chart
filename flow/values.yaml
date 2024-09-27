@@ -1,12 +1,18 @@
+namespace:
+  name: ''
+  create: false
+  enabled: false
+
 deployment:
-  name: fraud-service
-  namespace: flow
+  name: ''
+  enabled: false
+  namespace: ''
   replicaCount: 1
   restartPolicy: Always
-  args: [ ]
+  args: { }
   image:
-    repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
-    tag: latest
+    repository: ''
+    tag: ''
     pullPolicy: Always
   ports:
     - name: http
@@ -14,7 +20,8 @@ deployment:
       protocol: TCP
 
 service:
-  name: fraud-service
+  name: ''
+  enabled: false
   type: ClusterIP
   namespace: flow
   ports:
@@ -26,71 +33,59 @@ service:
 resources:
   enabled: true
   limits:
-    cpu: 100m
-    memory: 128Mi
+    cpu: ''
+    memory: ''
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: ''
+    memory: ''
 
 autoscaling:
   enabled: false
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
 
 configMap:
-  enabled: true
-  name: fraud-service
-  namespace: flow
-  data:
-    DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
-    DB.PORT: "5432"
-    DB.NAME: "hydrate_aqm_fraud_p_db"
-    DB.USER: "hydrate"
-    DB.PASS: "ujy5azp.xrn3CMV0get"
-    KC.REALM: "hydrate"
-    KC.BASE_URL: "https://accounts.hydrate.net/auth"
-    EUREKA_ENABLED: "false"
-    EUREKA_ZONE_URL: ""
-    EUREKA_PREFER_IP: "false"
-    EUREKA_REGISTER: "false"
-    EUREKA_FETCH_REGISTRY: "false"
+  enabled: false
+  name: ''
+  namespace: ''
+  data: { }
 
 secrets:
+  name: ''
+  namespace: ''
   enabled: false
-  namespace: default
-  name: flow
   data: { }
 
 certificate:
   enabled: false
-  name: "flow"
-  namespace: istio-system
-  secretName: "flow"
-  issuerRef: letsencrypt
-  commonName: dev.everyflow.org
+  name: ''
+  namespace: ''
+  secretName: ''
+  issuerRef: ''
+  commonName: ''
   dnsNames: { }
 
 gateway:
   enabled: false
-  name: my-istio-gateway
-  namespace: istio-ingress
-  specSelector: ingressgateway
+  name: ''
+  namespace: ''
+  specSelector: ''
   servers:
     - port:
         number: 80
         name: http
         protocol: http
       hosts:
-        - "1flow.org"
+        - '*'
     - port:
         number: 443
         name: https
         protocol: https
       hosts:
-        - "1flow.org"
+        - '*'
       tls:
         mode: SIMPLE
-        credentialName: keycloak-tls
+        credentialName: ''
 
 virtualService:
   enabled: true
@@ -101,33 +96,40 @@ virtualService:
   tcpRoutes: { }
 
 destinationRule:
-  enabled: true
-  name: ''
-  namespace: ''
-  host: ''
   trafficPolicy: { }
   portLevelSettings: { }
   subsets: { }
+  enabled: false
+  name: ''
+  host: ''
+  namespace: ''
+  gateway: ''
+  routeDefinitions: { }
+  destinationHost: ''
+  destinationPort: ''
+  healthCheckPath: ''
+  allowOrigins:
+    exact: "*"
+  allowHeaders: { }
+  allowMethods: { }
 
 persistentVolume:
   enabled: false
   name: ''
-  namespace: default
+  namespace: ''
   labelType: ''
   storage:
-    className: 'default'
-    capacity: '10Gi'
-  accessModes:
-    - ReadWriteOnce
-  hostPath: '/mnt/data'
+    className: ''
+    capacity: ''
+  accessModes: { }
+  hostPath: ''
 
 persistentVolumeClaim:
   name: ''
-  namespace: default
+  namespace: ''
   enabled: false
-  accessModes:
-    - ReadWriteOnce
-  storage: 16Gi
+  accessModes: { }
+  storage: ''
 
 cronJob:
   enabled: false
@@ -146,36 +148,29 @@ cronJob:
 
 
 argocd:
-  name: ' '
-  enabled: true
-  namespace: ' '
-  projectName: 'flow-production'
-  sources: [ ]
+  name: ''
+  enabled: false
+  namespace: ''
+  projectName: ''
+  sources: { }
   sync:
     automated:
-      prune: 'true'
-      selfHeal: 'true'
-    options:
-      - RespectIgnoreDifferences=true
-      - PruneLast=true
-      - Validate=false
-      - ServerSideApply=true
-      - ApplyOutOfSyncOnly=true
-      - CreateNamespace=true
+      prune: 'false'
+      selfHeal: 'false'
+    options: { }
     retry:
-      limit: '2'
-      backoffDuration: '5s'
-      backOffMaxDuration: '3m0s'
-      backOffFactor: '2'
+      limit: ''
+      backoffDuration: ''
+      backOffMaxDuration: ''
+      backOffFactor: ''
   destination:
     name: ''
-    namespace: 'flow'
-    server: 'https://kubernetes.default.svc'
+    namespace: ''
+    server: ''
   repository:
-    url: 'https://factory24.github.io/flow-helm-chart/'
+    url: ''
     path: ''
-    targetRevision: '0.1.12'
+    targetRevision: '0.1.13'
     chart: 'flow-helm-chart'
-    valueFiles:
-      - values.yaml
-  values: { }
+    valueFiles: { }
+  values: ''

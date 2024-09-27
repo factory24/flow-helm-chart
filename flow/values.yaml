@@ -94,30 +94,24 @@ gateway:
 
 virtualService:
   enabled: true
-  name: fraud-service
-  host: api.hydrate.local
-  namespace: flow
-  gateway: hydrate-gateway
-  routeDefinitions:
-    - /v1/fraud
-  destinationHost: fraud-service.athari-dev.svc.cluster.local
-  destinationPort: 8080
-  healthCheckPath: /health
-  allowOrigins:
-    exact: "*"
-  allowHeaders:
-    - Content-Type
-    - Authorization
-  allowMethods:
-    - GET
-    - POST
-    - PUT
-    - PATCH
-    - DELETE
+  name: ''
+  namespace: prod
+  host: "api.1flow.org"
+  httpRoutes: { }
+  tcpRoutes: { }
+
+destinationRule:
+  enabled: true
+  name: ''
+  namespace: ''
+  host: ''
+  trafficPolicy: { }
+  portLevelSettings: { }
+  subsets: { }
 
 persistentVolume:
   enabled: false
-  name: bizops
+  name: ''
   namespace: default
   labelType: ''
   storage:
@@ -128,12 +122,28 @@ persistentVolume:
   hostPath: '/mnt/data'
 
 persistentVolumeClaim:
-  name: bizopsclaim
+  name: ''
   namespace: default
   enabled: false
   accessModes:
     - ReadWriteOnce
   storage: 16Gi
+
+cronJob:
+  enabled: false
+  name: ''
+  namespace: ''
+  schedule: "59 23 28-31 * *"
+  restartPolicy: OnFailure
+  containers:
+    - name: hello
+      image: busybox:1.28
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+        - -c
+        - date; echo Hello from the Kubernetes cluster
+
 
 argocd:
   name: ' '
@@ -168,118 +178,4 @@ argocd:
     chart: 'flow-helm-chart'
     valueFiles:
       - values.yaml
-  values: |
-    deployment:
-      name: fraud-service
-      namespace: flow
-      replicaCount: 1
-      restartPolicy: Always
-      args: []
-      image:
-        repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
-        tag: latest
-        pullPolicy: Always
-      ports:
-        - name: http
-          containerPort: 8080
-          protocol: TCP
-
-    service:
-      name: fraud-service
-      type: ClusterIP
-      namespace: flow
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
-
-    resources:
-      enabled: true
-      limits:
-        cpu: 100m
-        memory: 128Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-
-    autoscaling:
-      enabled: false
-      minReplicas: 1
-      maxReplicas: 10
-
-    configMap:
-      enabled: true
-      name: fraud-service
-      namespace: flow
-      data:
-        DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
-        DB.PORT: "5432"
-        DB.NAME: "hydrate_aqm_fraud_p_db"
-        DB.USER: "hydrate"
-        DB.PASS: "ujy5azp.xrn3CMV0get"
-        KC.REALM: "hydrate"
-        KC.BASE_URL: "https://accounts.hydrate.net/auth"
-        EUREKA_ENABLED: "false"
-        EUREKA_ZONE_URL: ""
-        EUREKA_PREFER_IP: "false"
-        EUREKA_REGISTER: "false"
-        EUREKA_FETCH_REGISTRY: "false"
-
-    secrets:
-      enabled: false
-      namespace: default
-      name: flow
-      data: { }
-
-    certificate:
-      enabled: false
-      name: "flow"
-      namespace: istio-system
-      secretName: "flow"
-      issuerRef: letsencrypt
-      commonName: dev.everyflow.org
-      dnsNames: { }
-
-    gateway:
-      enabled: false  # Enable the Gateway deployment
-      name: my-istio-gateway  # Name for the Gateway resource
-      namespace: istio-ingress  # Namespace where the Gateway will be deployed
-      specSelector: ingressgateway
-      servers:
-        - port:
-            number: 80
-            name: http
-            protocol: http
-          hosts:
-            - "1flow.org"
-        - port:
-            number: 443
-            name: https
-            protocol: https
-          hosts:
-            - "1flow.org"
-          tls:
-            mode: SIMPLE
-            credentialName: keycloak-tls
-
-    virtualService:
-      enabled: true
-      name: fraud-service
-      host: api.hydrate.local
-      namespace: flow
-      gateway: hydrate-gateway
-      routeDefinitions:
-        - /v1/fraud
-      destinationHost: fraud-service.athari-dev.svc.cluster.local
-      destinationPort: 8080
-      healthCheckPath: /health
-      allowOrigins:
-        exact: "*"
-      allowHeaders:
-        - Content-Type
-        - Authorization
-      allowMethods:
-        - GET
-        - POST
-        - PUT
-        - PATCH
-        - DELETE
+  values: { }

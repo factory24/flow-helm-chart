@@ -5,23 +5,16 @@ deployment:
   restartPolicy: Always
   args: [ ]
   image:
-    repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
-    tag: latest
+    repository: ''
+    tag: ''
     pullPolicy: Always
-  ports:
-    - name: http
-      containerPort: 8080
-      protocol: TCP
+  ports: { }
 
 service:
   name: fraud-service
   type: ClusterIP
   namespace: flow
-  ports:
-    - port: 8080
-      name: http
-      targetPort: 8080
-      protocol:
+  ports: { }
 
 resources:
   enabled: true
@@ -41,19 +34,7 @@ configMap:
   enabled: true
   name: fraud-service
   namespace: flow
-  data:
-    DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
-    DB.PORT: "5432"
-    DB.NAME: "hydrate_aqm_fraud_p_db"
-    DB.USER: "hydrate"
-    DB.PASS: "ujy5azp.xrn3CMV0get"
-    KC.REALM: "hydrate"
-    KC.BASE_URL: "https://accounts.hydrate.net/auth"
-    EUREKA_ENABLED: "false"
-    EUREKA_ZONE_URL: ""
-    EUREKA_PREFER_IP: "false"
-    EUREKA_REGISTER: "false"
-    EUREKA_FETCH_REGISTRY: "false"
+  data: { }
 
 secrets:
   enabled: false
@@ -63,72 +44,28 @@ secrets:
 
 certificate:
   enabled: false
-  name: "flow"
-  namespace: istio-system
-  secretName: "flow"
-  issuerRef: letsencrypt
-  commonName: dev.everyflow.org
+  name: ''
+  namespace: ''
+  secretName: ''
+  issuerRef: ''
+  commonName: ''
   dnsNames: { }
 
 gateway:
   enabled: false
-  name: my-istio-gateway
-  namespace: istio-ingress
-  specSelector: ingressgateway
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: http
-      hosts:
-        - "1flow.org"
-    - port:
-        number: 443
-        name: https
-        protocol: https
-      hosts:
-        - "1flow.org"
-      tls:
-        mode: SIMPLE
-        credentialName: keycloak-tls
+  name: ''
+  namespace: ''
+  specSelector: ''
+  servers: { }
 
 virtualService:
-  enabled: true
-  name: fraud-service
-  gateways:
-    - api-gateway
-  httpRoutes:
-    - name: fraud-service
-      corsPolicy:
-        allowHeaders:
-          - authorization
-          - content-type
-        allowOrigins:
-          exact: "*"
-        allowMethods:
-          - GET
-          - PUT
-          - POST
-          - PATCH
-          - DELETE
-      match:
-        - uri:
-            prefix: /v1/fraud
-      route:
-        - destination:
-            host: fraud-service.default.svc.cluster.local
-            port:
-              number: 8080
-  tcpRoutes:
-    - match:
-        - port: 444
-      route:
-        - destination:
-            host: fraud-service.default.svc.cluster.local
-            port:
-              number: 444
-  namespace: flow
-  host: api.1flow.org
+  enabled: false
+  name: ''
+  gateways: { }
+  httpRoutes: { }
+  tcpRoutes: { }
+  namespace: ''
+  host: ''
 
 destinationRule:
   enabled: false
@@ -137,14 +74,14 @@ destinationRule:
   host: ''
   trafficPolicy:
     loadBalancer:
-      simple: LEAST_REQUEST
+      simple: ''
   subsets:
-    - name: testversion
+    - name: ''
       labels:
         version: v3
       trafficPolicy:
         loadBalancer:
-          simple: ROUND_ROBIN
+          simple: ''
 
 
 cronJob:
@@ -152,8 +89,8 @@ cronJob:
 
 persistentVolume:
   enabled: false
-  name: bizops
-  namespace: default
+  name: ''
+  namespace: ''
   labelType: ''
   storage:
     className: 'default'
@@ -163,8 +100,8 @@ persistentVolume:
   hostPath: '/mnt/data'
 
 persistentVolumeClaim:
-  name: bizopsclaim
-  namespace: default
+  name: ''
+  namespace: ''
   enabled: false
   accessModes:
     - ReadWriteOnce
@@ -172,9 +109,9 @@ persistentVolumeClaim:
 
 argocd:
   name: ' '
-  enabled: true
+  enabled: false
   namespace: ' '
-  projectName: 'flow-production'
+  projectName: ''
   sources: [ ]
   sync:
     automated:
@@ -194,12 +131,12 @@ argocd:
       backOffFactor: '2'
   destination:
     name: ''
-    namespace: 'flow'
+    namespace: ''
     server: 'https://kubernetes.default.svc'
   repository:
-    url: 'https://factory24.github.io/flow-helm-chart/'
+    url: ''
     path: ''
-    targetRevision: '0.1.12'
-    chart: 'flow-helm-chart'
+    targetRevision: ''
+    chart: ''
     valueFiles: { }
   values: { }

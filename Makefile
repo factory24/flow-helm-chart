@@ -6,7 +6,7 @@ lint:
 	helm lint flow
 
 template:
-	helm template flow-helm-chart flow --values flow/values.yaml
+	helm template flow-helm-chart flow --debug --values flow/values.yaml
 
 bundle:
 	make lint

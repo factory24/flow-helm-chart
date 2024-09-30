@@ -5,8 +5,8 @@ deployment:
   restartPolicy: Always
   args: [ ]
   image:
-    repository: ''
-    tag: ''
+    repository: gfacratharidazwe.azurecr.io
+    tag: latest
     pullPolicy: Always
   ports: { }
 
@@ -59,13 +59,40 @@ gateway:
   servers: { }
 
 virtualService:
-  enabled: false
-  name: ''
-  gateways: { }
-  httpRoutes: { }
-  tcpRoutes: { }
-  namespace: ''
-  host: ''
+  enabled: true
+  name: fraud-service
+  gateways:
+    - api-gateway
+  httpRoutes:
+    - name: fraud-service
+      corsPolicy:
+        allowHeaders:
+          - authorization
+          - content-type
+        allowMethods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+      match:
+        - uri:
+            prefix: /v1/fraud
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 8080
+  tcpRoutes:
+    - match:
+        - port: 444
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 444
+  namespace: flow
+  host: api.1flow.org
 
 destinationRule:
   enabled: false

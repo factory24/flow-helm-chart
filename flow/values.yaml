@@ -99,6 +99,18 @@ virtualService:
     - api-gateway
   httpRoutes:
     - name: fraud-service
+      corsPolicy:
+        allowHeaders:
+          - authorization
+          - content-type
+        allowOrigins:
+          exact: "*"
+        allowMethods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
       match:
         - uri:
             prefix: /v1/fraud

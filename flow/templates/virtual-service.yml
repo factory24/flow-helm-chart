@@ -1,5 +1,5 @@
 {{ if .Values.virtualService.enabled }}
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: {{ .Values.virtualService.name }}
@@ -7,29 +7,46 @@ metadata:
 spec:
   hosts:
     - {{ .Values.virtualService.host }}
-  gateways:
-    - {{ .Values.virtualService.gateway }}
+  {{ if and .Values.virtualService.httpRoutes (not (empty .Values.virtualService.httpRoutes)) }}
   http:
-    - name: {{ .Values.virtualService.name }}
+  {{- range .Values.virtualService.httpRoutes }}
+    - name: {{ .name }}
       match:
-        {{ range $index, $element := .Values.virtualService.routeDefinitions }}
+      {{- range .match }}
         - uri:
-            prefix: {{ $element }}
-        {{- end }}
+            prefix: {{ .uri.prefix }}
+      {{- end }}
+      {{- if .rewrite }}
+      rewrite:
+        uri: {{ .rewrite.uri }}
+      {{- end }}
       route:
+      {{- range .route }}
         - destination:
-            host: {{ .Values.virtualService.destinationHost }}
+            host: {{ .destination.host }}
+            {{ if .destination.subset }}
+            subset: {{ .destination.subset }}
+            {{- end }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{ if and .Values.virtualService.tcpRoutes (not (empty .Values.virtualService.tcpRoutes ) ) }}
+  tcp:
+  {{- if .Values.virtualService.tcpRoutes }}
+  {{- range .Values.virtualService.tcpRoutes }}
+    - match:
+      {{- range .match }}
+        - port: {{ .port }}
+      {{- end }}
+      route:
+      {{- range .route }}
+        - destination:
+            host: {{ .destination.host }}
             port:
-              number: {{ .Values.virtualService.destinationPort }}
-      corsPolicy:
-        allowOrigins:
-          - exact: {{ .Values.virtualService.allowOrigins.exact | quote }}
-        allowHeaders:
-          {{ range .Values.virtualService.allowHeaders }}
-          - {{ . | quote }}
-          {{- end }}
-        allowMethods:
-          {{ range .Values.virtualService.allowMethods }}
-          - {{ . | quote }}
-          {{- end }}
+              number: {{ .destination.port.number }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}

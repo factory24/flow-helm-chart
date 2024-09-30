@@ -19,7 +19,6 @@ service:
   namespace: flow
   ports:
     - port: 8080
-      name: http
       targetPort: 8080
       protocol: TCP
 
@@ -136,9 +135,9 @@ persistentVolumeClaim:
   storage: 16Gi
 
 argocd:
-  name: 'flow'
+  name: ' '
   enabled: true
-  namespace: 'flow'
+  namespace: ' '
   projectName: 'flow-production'
   sources: [ ]
   sync:

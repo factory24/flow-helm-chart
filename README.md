@@ -114,11 +114,41 @@ gateway:
 
 virtualService:
   enabled: true
-  name: ''
-  namespace: prod
-  host: "api.1flow.org"
-  httpRoutes: { }
-  tcpRoutes: { }
+  name: fraud-service
+  gateways:
+    - api-gateway
+  httpRoutes:
+    - name: fraud-service
+      corsPolicy:
+        allowHeaders:
+          - authorization
+          - content-type
+        allowOrigins:
+          exact: "*"
+        allowMethods:
+          - GET
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+      match:
+        - uri:
+            prefix: /v1/fraud
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 8080
+  tcpRoutes:
+    - match:
+        - port: 444
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 444
+  namespace: flow
+  host: api.1flow.org
 
 destinationRule:
   enabled: true

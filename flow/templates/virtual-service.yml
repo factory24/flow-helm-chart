@@ -20,7 +20,7 @@ spec:
       {{ if and .corsPolicy (not (empty .corsPolicy)) }}
       corsPolicy:
         allowOrigins:
-          exact: "*"
+          - exact: "*"
         {{ if and .corsPolicy.allowMethods (not (empty .corsPolicy.allowMethods)) }}
         allowMethods:
           {{ range .corsPolicy.allowMethods }}

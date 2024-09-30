@@ -19,6 +19,8 @@ spec:
     - name: {{ .name }}
       {{ if and .corsPolicy (not (empty .corsPolicy)) }}
       corsPolicy:
+        allowOrigins:
+          exact: "*"
         {{ if and .corsPolicy.allowMethods (not (empty .corsPolicy.allowMethods)) }}
         allowMethods:
           {{ range .corsPolicy.allowMethods }}
@@ -30,12 +32,6 @@ spec:
           {{ range .corsPolicy.allowHeaders }}
           - {{ . | title }}
           {{ end }}
-        {{ if and .corsPolicy.allowOrigins (not (empty .corsPolicy.allowOrigins)) }}
-        allowOrigins:
-          {{ range $k, $v := .corsPolicy.allowOrigins }}
-          {{ $k }}: {{ $v | quote }}
-          {{ end }}
-        {{ end }}
         {{ end }}
       {{ end }}
       match:

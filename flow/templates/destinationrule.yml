@@ -5,10 +5,10 @@ metadata:
   name: {{ .Values.destinationRule.name }}
   namespace: {{ .Values.destinationRule.namespace }}
 spec:
-  host: ratings.prod.svc.cluster.local
+  host: {{ .Values.destinationRule.host }}
   trafficPolicy:
     loadBalancer:
-      simple: LEAST_REQUEST
+      simple: {{ .Values.destinationRule.trafficPolicy.loadBalancer.simple | upper }}
     {{ if and .Values.destinationRule.portLevelSettings (not (empty .Values.destinationRule.portLevelSettings )) }}
     portLevelSettings:
       {{ range .Values.destinationRule.portLevelSettings }}

@@ -7,6 +7,12 @@ metadata:
 spec:
   hosts:
     - {{ .Values.virtualService.host }}
+      {{ if .Values.virtualService.gateways }}
+  gateways:
+    {{- range .Values.virtualService.gateways }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
   {{ if and .Values.virtualService.httpRoutes (not (empty .Values.virtualService.httpRoutes)) }}
   http:
   {{- range .Values.virtualService.httpRoutes }}

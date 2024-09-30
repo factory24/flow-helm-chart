@@ -36,7 +36,7 @@ deployment:
 service:
   name: fraud-service
   type: ClusterIP
-  namespace: flow
+  namespace: default
   ports:
     - port: 8080
       name: http

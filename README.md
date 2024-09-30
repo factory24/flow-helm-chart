@@ -19,17 +19,22 @@ helm install card-service flow-helm-chart
 
 ```yaml
 deployment:
-  name: billing-service
-  namespace: default
+  name: fraud-service
+  namespace: flow
   replicaCount: 1
   restartPolicy: Always
+  args: [ ]
   image:
-    repository: athari/billing-service
+    repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
     tag: latest
-    pullPolicy: Never
+    pullPolicy: Always
+  ports:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
 
 service:
-  name: billing-service
+  name: fraud-service
   type: ClusterIP
   namespace: default
   ports:
@@ -48,24 +53,36 @@ resources:
     memory: 128Mi
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
-  maxReplicas: 100
+  maxReplicas: 10
 
 configMap:
   enabled: true
-  name: billing-service
-  namespace: default
-  data: { }
+  name: fraud-service
+  namespace: flow
+  data:
+    DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
+    DB.PORT: "5432"
+    DB.NAME: "hydrate_aqm_fraud_p_db"
+    DB.USER: "hydrate"
+    DB.PASS: "ujy5azp.xrn3CMV0get"
+    KC.REALM: "hydrate"
+    KC.BASE_URL: "https://accounts.hydrate.net/auth"
+    EUREKA_ENABLED: "false"
+    EUREKA_ZONE_URL: ""
+    EUREKA_PREFER_IP: "false"
+    EUREKA_REGISTER: "false"
+    EUREKA_FETCH_REGISTRY: "false"
 
 secrets:
-  enabled: true
+  enabled: false
   namespace: default
   name: flow
   data: { }
 
 certificate:
-  enabled: true
+  enabled: false
   name: "flow"
   namespace: istio-system
   secretName: "flow"
@@ -74,51 +91,114 @@ certificate:
   dnsNames: { }
 
 gateway:
-  enabled: true  # Enable the Gateway deployment
-  name: my-istio-gateway  # Name for the Gateway resource
-  namespace: istio-ingress  # Namespace where the Gateway will be deployed
+  enabled: false
+  name: my-istio-gateway
+  namespace: istio-ingress
   specSelector: ingressgateway
   servers:
     - port:
         number: 80
         name: http
-        protocol: HTTP
+        protocol: http
       hosts:
         - "1flow.org"
-      tls:
-        httpsRedirect: true
     - port:
         number: 443
         name: https
-        protocol: HTTPS
+        protocol: https
       hosts:
         - "1flow.org"
       tls:
         mode: SIMPLE
-        credentialName: flow-landing-tls
+        credentialName: keycloak-tls
 
 virtualService:
   enabled: true
-  name: billing-service
-  host: api.hydrate.local
+  name: ''
+  namespace: prod
+  host: "api.1flow.org"
+  httpRoutes: { }
+  tcpRoutes: { }
+
+destinationRule:
+  enabled: true
+  name: ''
+  namespace: ''
+  host: ''
+  trafficPolicy: { }
+  portLevelSettings: { }
+  subsets: { }
+
+persistentVolume:
+  enabled: false
+  name: ''
   namespace: default
-  gateway: api-gateway
-  routePrefix: /v1/billing
-  destinationHost: billing-service.default.svc.cluster.local
-  destinationPort: 8080
-  healthCheckPath: /health
-  allowOrigins:
-    exact: "https://1flow.org"
-  #    prefix: "/v1"
-  #    regex: ""
-  allowHeaders:
-    - Content-Type
-    - Authorization
-  allowMethods:
-    - GET
-    - POST
-    - PUT
-    - PATCH
+  labelType: ''
+  storage:
+    className: 'default'
+    capacity: '10Gi'
+  accessModes:
+    - ReadWriteOnce
+  hostPath: '/mnt/data'
+
+persistentVolumeClaim:
+  name: ''
+  namespace: default
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  storage: 16Gi
+
+cronJob:
+  enabled: false
+  name: ''
+  namespace: ''
+  schedule: "59 23 28-31 * *"
+  restartPolicy: OnFailure
+  containers:
+    - name: hello
+      image: busybox:1.28
+      imagePullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+        - -c
+        - date; echo Hello from the Kubernetes cluster
+
+
+argocd:
+  name: 'flow'
+  enabled: true
+  namespace: 'flow'
+  projectName: 'flow-production'
+  sources: [ ]
+  sync:
+    automated:
+      prune: 'true'
+      selfHeal: 'true'
+    options:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - Validate=false
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+    retry:
+      limit: '2'
+      backoffDuration: '5s'
+      backOffMaxDuration: '3m0s'
+      backOffFactor: '2'
+  destination:
+    name: ''
+    namespace: 'flow'
+    server: 'https://kubernetes.default.svc'
+  repository:
+    url: 'https://factory24.github.io/flow-helm-chart/'
+    path: ''
+    targetRevision: '0.1.12'
+    chart: 'flow-helm-chart'
+    valueFiles:
+      - values.yaml
+  values: { }
 
 
 ```

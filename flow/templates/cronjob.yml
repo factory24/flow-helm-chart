@@ -1,0 +1,26 @@
+{{ if .Values.cronJob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.cronJob.name }}
+  namespace: {{ .Values.cronJob.namespace }}
+spec:
+  schedule: {{ .Values.cronJob.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{ if and .Values.cronJob.containers (not (empty .Values.cronJob.containers ) ) }}
+          containers:
+            {{ range .Values.cronJob.containers }}
+            - name: {{ .name }}
+              image: {{ .image }}
+              imagePullPolicy: {{ .imagePullPolicy }}
+              command:
+                {{ range .command }}
+                {{ . }}
+                {{ end }}
+            {{ end }}
+          {{- end }}
+          restartPolicy: {{ .Values.cronJob.restartPolicy }}
+{{- end }}

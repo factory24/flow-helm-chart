@@ -92,29 +92,6 @@ gateway:
         mode: SIMPLE
         credentialName: keycloak-tls
 
-#virtualService:
-#  enabled: true
-#  name: fraud-service
-#  host: api.hydrate.local
-#  namespace: flow
-#  gateway: hydrate-gateway
-#  routeDefinitions:
-#    - /v1/fraud
-#  destinationHost: fraud-service.athari-dev.svc.cluster.local
-#  destinationPort: 8080
-#  healthCheckPath: /health
-#  allowOrigins:
-#    exact: "*"
-#  allowHeaders:
-#    - Content-Type
-#    - Authorization
-#  allowMethods:
-#    - GET
-#    - POST
-#    - PUT
-#    - PATCH
-#    - DELETE
-
 virtualService:
   enabled: true
   name: fraud-service

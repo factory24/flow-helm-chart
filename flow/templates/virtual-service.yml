@@ -17,6 +17,27 @@ spec:
   http:
   {{- range .Values.virtualService.httpRoutes }}
     - name: {{ .name }}
+      {{ if and .corsPolicy (not (empty .corsPolicy)) }}
+      corsPolicy:
+        {{ if and .corsPolicy.allowMethods (not (empty .corsPolicy.allowMethods)) }}
+        allowMethods:
+          {{ range .corsPolicy.allowMethods }}
+          - {{ . | upper }}
+          {{ end }}
+        {{ end }}
+        {{ if and .corsPolicy.allowHeaders (not (empty .corsPolicy.allowHeaders)) }}
+        allowHeaders:
+          {{ range .corsPolicy.allowHeaders }}
+          - {{ . | title }}
+          {{ end }}
+        {{ if and .corsPolicy.allowOrigins (not (empty .corsPolicy.allowOrigins)) }}
+        allowOrigins:
+          {{ range $k, $v := .corsPolicy.allowOrigins }}
+          {{ $k }}: {{ $v | quote }}
+          {{ end }}
+        {{ end }}
+        {{ end }}
+      {{ end }}
       match:
       {{- range .match }}
         - uri:

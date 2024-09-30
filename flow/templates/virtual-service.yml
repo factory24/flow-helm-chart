@@ -47,6 +47,8 @@ spec:
       {{- range .route }}
         - destination:
             host: {{ .destination.host }}
+            port:
+              number: {{ .destination.port.number }}
             {{ if .destination.subset }}
             subset: {{ .destination.subset }}
             {{- end }}

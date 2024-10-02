@@ -1,5 +1,6 @@
 deployment:
   name: fraud-service
+  enabled: true
   namespace: flow
   replicaCount: 1
   restartPolicy: Always
@@ -12,6 +13,7 @@ deployment:
 
 service:
   name: fraud-service
+  enabled: true
   type: ClusterIP
   namespace: flow
   ports: { }

@@ -1,6 +1,6 @@
 deployment:
   name: fraud-service
-  enabled: true
+  enabled: false
   namespace: flow
   replicaCount: 1
   restartPolicy: Always
@@ -13,13 +13,13 @@ deployment:
 
 service:
   name: fraud-service
-  enabled: true
+  enabled: false
   type: ClusterIP
   namespace: flow
   ports: { }
 
 resources:
-  enabled: true
+  enabled: false
   limits:
     cpu: 100m
     memory: 128Mi
@@ -33,7 +33,7 @@ autoscaling:
   maxReplicas: 10
 
 configMap:
-  enabled: true
+  enabled: false
   name: fraud-service
   namespace: flow
   data: { }
@@ -61,7 +61,7 @@ gateway:
   servers: { }
 
 virtualService:
-  enabled: true
+  enabled: false
   name: fraud-service
   gateways:
     - api-gateway
@@ -112,9 +112,12 @@ destinationRule:
         loadBalancer:
           simple: ''
 
-
 cronJob:
   enabled: false
+  name: ''
+  namespace: default
+  schedule: "59 23 28-31 * *"
+  containers: { }
 
 persistentVolume:
   enabled: false

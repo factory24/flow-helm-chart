@@ -180,20 +180,35 @@ persistentVolumeClaim:
   storage: 16Gi
 
 cronJob:
-  enabled: false
-  name: ''
-  namespace: ''
+  enabled: true
+  name: 'device-alert-worker'
+  namespace: default
   schedule: "59 23 28-31 * *"
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
   restartPolicy: OnFailure
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 20
+  ttlSecondsAfterFinished:
+  suspend: false
+  parallelism: 1
+  completions: 5
+  activeDeadlineSeconds: 20
+  completionMode: NonIndexed
+  backoffLimit: 5
+  backoffLimitPerIndex: ''
   containers:
     - name: hello
       image: busybox:1.28
       imagePullPolicy: IfNotPresent
+      configMap:
+        name: 'device-alert-worker'
+      secretMap:
+        name: 'device-alert-worker'
       command:
         - /bin/sh
         - -c
         - date; echo Hello from the Kubernetes cluster
-
 
 argocd:
   name: 'flow'

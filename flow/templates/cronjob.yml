@@ -22,6 +22,12 @@ spec:
       backoffLimit: {{ .Values.cronJob.backoffLimit | default 5 }}
       backoffLimitPerIndex: {{ .Values.cronJob.backoffLimitPerIndex }}
       template:
+        {{ if and .Values.cronJob.metadata (not (empty .Values.cronJob.metadata)) }}
+        metadata:
+          {{ range $k, $v := .Values.cronJob.metadata }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- end }}
         spec:
           {{ if and .Values.cronJob.containers (not (empty .Values.cronJob.containers ) ) }}
           containers:

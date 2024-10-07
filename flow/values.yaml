@@ -118,6 +118,7 @@ cronJob:
   namespace: default
   schedule: "59 23 28-31 * *"
   containers: { }
+  metadata: { }
 
 persistentVolume:
   enabled: false

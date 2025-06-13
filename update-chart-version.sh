@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHART_FILE="charts/rimdesk-chart/Chart.yaml"
+CHART_FILE="flow/Chart.yaml"
 VERSION_REGEX="^version: ([0-9]+\.[0-9]+\.[0-9]+)$"
 
 if [[ -f "$CHART_FILE" ]]; then

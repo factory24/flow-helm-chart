@@ -1,9 +1,13 @@
-{{ if .Values.virtualService.enabled }}
+{{- $name := coalesce .Values.virtualService.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.virtualService.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.virtualService.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: {{ .Values.virtualService.name }}
-  namespace: {{ .Values.virtualService.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   hosts:
     - {{ .Values.virtualService.host }}
@@ -46,7 +50,7 @@ spec:
       route:
       {{- range .route }}
         - destination:
-            host: {{ .destination.host }}
+            host: {{ coalesce $.Values.deployment.name $.Values.serviceProperties.name }}.{{ coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace }}.svc.cluster.local
             port:
               number: {{ .destination.port.number }}
             {{ if .destination.subset }}
@@ -67,7 +71,7 @@ spec:
       route:
       {{- range .route }}
         - destination:
-            host: {{ .destination.host }}
+            host: {{ coalesce $.Values.deployment.name $.Values.serviceProperties.name }}.{{ coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace }}.svc.cluster.local
             port:
               number: {{ .destination.port.number }}
       {{- end }}

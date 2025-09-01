@@ -3,24 +3,68 @@
 
 ## Overview
 
-This Helm chart provides [brief description of the application or service being deployed].
+This Helm chart provides a flexible and reusable way to deploy services to Kubernetes. It is designed to be highly configurable and to reduce repetition in your service definitions.
 
 ## Prerequisites
 
-- [List any prerequisites or dependencies required before deploying the Helm chart]
+- Kubernetes 1.19+
+- Helm 3.2.0+
+- Istio (optional, for advanced networking features)
+- Cert-manager (optional, for automated certificate management)
 
 ## Installation
 
 To install the Helm chart, use the following command:
 
 ```bash
-helm install card-service flow-helm-chart
+helm install [RELEASE_NAME] flow-helm-chart/flow-helm-chart
 ```
+
+## Configuration
+
+This chart is configured using the `values.yaml` file. The following sections describe the available configuration options.
+
+### `serviceProperties`
+
+This section defines the default properties for all services deployed with this chart. These properties can be overridden in the specific service sections.
+
+- `name`: The name of the service.
+- `namespace`: The namespace to deploy the service to.
+- `enabled`: Whether the service is enabled or not.
+
+Example:
+
+```yaml
+serviceProperties:
+  name: "default-service"
+  namespace: "default-namespace"
+  enabled: true
+```
+
+### Overriding Default Properties
+
+You can override the default properties in the specific service sections. For example, to override the `name` and `namespace` for the `deployment`, you would configure the `deployment` section as follows:
 
 ```yaml
 deployment:
-  name: fraud-service
-  namespace: flow
+  name: "my-deployment"
+  namespace: "my-namespace"
+  # ... other deployment properties
+```
+
+If a property is not defined in the specific service section, the value from `serviceProperties` will be used.
+
+### Example `values.yaml`
+
+Here is an example of a `values.yaml` file that deploys a `fraud-service`:
+
+```yaml
+serviceProperties:
+  name: "fraud-service"
+  namespace: "flow"
+  enabled: true
+
+deployment:
   replicaCount: 1
   restartPolicy: Always
   args: [ ]
@@ -34,33 +78,15 @@ deployment:
       protocol: TCP
 
 service:
-  name: fraud-service
   type: ClusterIP
-  namespace: default
   ports:
     - port: 8080
       name: http
       targetPort: 8080
       protocol: TCP
 
-resources:
-  enabled: true
-  limits:
-    cpu: 100m
-    memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 10
-
 configMap:
   enabled: true
-  name: fraud-service
-  namespace: flow
   data:
     DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
     DB.PORT: "5432"
@@ -75,46 +101,8 @@ configMap:
     EUREKA_REGISTER: "false"
     EUREKA_FETCH_REGISTRY: "false"
 
-secrets:
-  enabled: false
-  namespace: default
-  name: flow
-  data: { }
-
-certificate:
-  enabled: false
-  name: "flow"
-  namespace: istio-system
-  secretName: "flow"
-  issuerRef: letsencrypt
-  commonName: dev.everyflow.org
-  dnsNames: { }
-
-gateway:
-  enabled: false
-  name: my-istio-gateway
-  namespace: istio-ingress
-  specSelector: ingressgateway
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: http
-      hosts:
-        - "1flow.org"
-    - port:
-        number: 443
-        name: https
-        protocol: https
-      hosts:
-        - "1flow.org"
-      tls:
-        mode: SIMPLE
-        credentialName: keycloak-tls
-
 virtualService:
   enabled: true
-  name: fraud-service
   gateways:
     - api-gateway
   httpRoutes:
@@ -136,114 +124,10 @@ virtualService:
             prefix: /v1/fraud
       route:
         - destination:
-            host: fraud-service.default.svc.cluster.local
             port:
               number: 8080
-  tcpRoutes:
-    - match:
-        - port: 444
-      route:
-        - destination:
-            host: fraud-service.default.svc.cluster.local
-            port:
-              number: 444
-  namespace: flow
   host: api.1flow.org
-
-destinationRule:
-  enabled: true
-  name: ''
-  namespace: ''
-  host: ''
-  trafficPolicy: { }
-  portLevelSettings: { }
-  subsets: { }
-
-persistentVolume:
-  enabled: false
-  name: ''
-  namespace: default
-  labelType: ''
-  storage:
-    className: 'default'
-    capacity: '10Gi'
-  accessModes:
-    - ReadWriteOnce
-  hostPath: '/mnt/data'
-
-persistentVolumeClaim:
-  name: ''
-  namespace: default
-  enabled: false
-  accessModes:
-    - ReadWriteOnce
-  storage: 16Gi
-
-cronJob:
-  enabled: true
-  name: 'device-alert-worker'
-  namespace: default
-  schedule: "59 23 28-31 * *"
-  failedJobsHistoryLimit: 1
-  successfulJobsHistoryLimit: 3
-  restartPolicy: OnFailure
-  concurrencyPolicy: Forbid
-  startingDeadlineSeconds: 20
-  ttlSecondsAfterFinished:
-  suspend: false
-  parallelism: 1
-  completions: 5
-  activeDeadlineSeconds: 20
-  completionMode: NonIndexed
-  backoffLimit: 5
-  backoffLimitPerIndex: ''
-  containers:
-    - name: hello
-      image: busybox:1.28
-      imagePullPolicy: IfNotPresent
-      configMap:
-        name: 'device-alert-worker'
-      secretMap:
-        name: 'device-alert-worker'
-      command:
-        - /bin/sh
-        - -c
-        - date; echo Hello from the Kubernetes cluster
-
-argocd:
-  name: 'flow'
-  enabled: true
-  namespace: 'flow'
-  projectName: 'flow-production'
-  sources: [ ]
-  sync:
-    automated:
-      prune: 'true'
-      selfHeal: 'true'
-    options:
-      - RespectIgnoreDifferences=true
-      - PruneLast=true
-      - Validate=false
-      - ServerSideApply=true
-      - ApplyOutOfSyncOnly=true
-      - CreateNamespace=true
-    retry:
-      limit: '2'
-      backoffDuration: '5s'
-      backOffMaxDuration: '3m0s'
-      backOffFactor: '2'
-  destination:
-    name: ''
-    namespace: 'flow'
-    server: 'https://kubernetes.default.svc'
-  repository:
-    url: 'https://factory24.github.io/flow-helm-chart/'
-    path: ''
-    targetRevision: '0.1.12'
-    chart: 'flow-helm-chart'
-    valueFiles:
-      - values.yaml
-  values: { }
+```
 
 
 ```

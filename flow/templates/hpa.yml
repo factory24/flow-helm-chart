@@ -1,14 +1,18 @@
-{{ if .Values.autoscaling.enabled }}
+{{- $name := coalesce .Values.deployment.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.deployment.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.autoscaling.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.deployment.name }}
-  namespace: {{ .Values.deployment.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.deployment.name }}
+    name: {{ $name }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

@@ -1,3 +1,9 @@
+# Default service properties
+serviceProperties:
+  name: "default-service"
+  namespace: "default-namespace"
+  enabled: true
+
 deployment:
   name: fraud-service
   enabled: false
@@ -6,7 +12,8 @@ deployment:
   restartPolicy: Always
   args: [ ]
   image:
-    repository: gfacratharidazwe.azurecr.io
+    # repository -- The image repository to pull from
+    repository: your-repo.acr.io
     tag: latest
     pullPolicy: Always
   ports: { }
@@ -94,7 +101,8 @@ virtualService:
             port:
               number: 444
   namespace: flow
-  host: api.1flow.org
+  # host -- The host for the virtual service
+  host: api.your-domain.com
 
 destinationRule:
   enabled: false
@@ -173,3 +181,40 @@ argocd:
     chart: ''
     valueFiles: { }
   values: { }
+
+hpa:
+  enabled: false
+  name: ''
+  namespace: ''
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max

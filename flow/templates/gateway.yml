@@ -1,9 +1,13 @@
-{{ if .Values.gateway.enabled }}
+{{- $name := coalesce .Values.gateway.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.gateway.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.gateway.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: {{ .Values.gateway.name }}
-  namespace: {{ .Values.gateway.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   selector:
     istio: {{ .Values.gateway.specSelector }}

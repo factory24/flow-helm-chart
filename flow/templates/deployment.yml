@@ -1,24 +1,28 @@
-{{ if .Values.deployment.enabled }}
+{{- $name := coalesce .Values.deployment.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.deployment.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.deployment.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.name }}
-  namespace: {{ .Values.deployment.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
   labels:
-    app: {{ .Values.deployment.name }}
+    app: {{ $name }}
 spec:
   replicas: {{ .Values.deployment.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.deployment.name }}
+      app: {{ $name }}
   template:
     metadata:
-      name: {{ .Values.deployment.name }}
+      name: {{ $name }}
       labels:
-        app: {{ .Values.deployment.name }}
+        app: {{ $name }}
     spec:
       containers:
-        - name: {{ .Values.deployment.name }}
+        - name: {{ $name }}
           image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           {{ if .Values.deployment.args }}
@@ -49,10 +53,10 @@ spec:
           envFrom:
           {{ if .Values.configMap.enabled}}
             - configMapRef:
-                name: {{ .Values.configMap.name }}
+                name: {{ coalesce .Values.configMap.name .Values.serviceProperties.name }}
             {{ if .Values.secrets.enabled }}
             - secretRef:
-                name: {{ .Values.secrets.name }}
+                name: {{ coalesce .Values.secrets.name .Values.serviceProperties.name }}
             {{- end }}
           {{- end }}
           {{- end }}

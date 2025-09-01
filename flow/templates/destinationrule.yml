@@ -1,11 +1,15 @@
-{{ if .Values.destinationRule.enabled }}
+{{- $name := coalesce .Values.destinationRule.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.destinationRule.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.destinationRule.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
-  name: {{ .Values.destinationRule.name }}
-  namespace: {{ .Values.destinationRule.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
-  host: {{ .Values.destinationRule.host }}
+  host: {{ coalesce .Values.destinationRule.host .Values.serviceProperties.name }}
   trafficPolicy:
     loadBalancer:
       simple: {{ .Values.destinationRule.trafficPolicy.loadBalancer.simple | upper }}

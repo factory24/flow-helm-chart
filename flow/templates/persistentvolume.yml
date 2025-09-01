@@ -1,9 +1,13 @@
-{{ if .Values.persistentVolume.enabled }}
+{{- $name := coalesce .Values.persistentVolume.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.persistentVolume.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.persistentVolume.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.persistentVolume.name}}
-  namespace: {{ .Values.persistentVolume.namespace }}
+  name: {{ $name}}
+  namespace: {{ $namespace }}
   labels:
     type: {{ .Values.persistentVolume.labelType}}
 spec:

@@ -1,9 +1,13 @@
-{{ if .Values.configMap.enabled }}
+{{- $name := coalesce .Values.configMap.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.configMap.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.configMap.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.configMap.name }}
-  namespace: {{ .Values.configMap.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 data:
     {{- range $k, $v := .Values.configMap.data }}
   {{ $k }}: {{ $v | quote }}

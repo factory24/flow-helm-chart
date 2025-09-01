@@ -1,9 +1,13 @@
-{{ if .Values.cronJob.enabled }}
+{{- $name := coalesce .Values.cronJob.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.cronJob.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.cronJob.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ .Values.cronJob.name }}
-  namespace: {{ .Values.cronJob.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   failedJobsHistoryLimit: {{ .Values.cronJob.failedJobsHistoryLimit | default 1 }}
   successfulJobsHistoryLimit: {{ .Values.cronJob.successfulJobsHistoryLimit | default 3 }}

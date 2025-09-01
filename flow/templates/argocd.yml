@@ -1,13 +1,17 @@
-{{ if .Values.argocd.enabled }}
+{{- $name := coalesce .Values.argocd.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.argocd.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := coalesce .Values.argocd.enabled .Values.serviceProperties.enabled -}}
+
+{{ if $enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values.argocd.name }}
-  namespace: {{ .Values.argocd.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   destination:
     name: {{ .Values.argocd.destination.name }}
-    namespace: {{ .Values.argocd.destination.namespace }}
+    namespace: {{ coalesce .Values.argocd.destination.namespace .Values.serviceProperties.namespace }}
     server: {{ .Values.argocd.destination.server }}
   source:
     path: {{ .Values.argocd.repository.path }}

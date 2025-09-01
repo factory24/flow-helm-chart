@@ -1,4 +1,5 @@
 
+
 # Helm Chart: [Flow Helm Chart]
 
 ## Overview
@@ -128,6 +129,37 @@ virtualService:
               number: 8080
   host: api.1flow.org
 ```
+
+### `cronJob`
+
+- `enabled`: Enable or disable the cronjob.
+- `name`: The name of the cronjob.
+- `namespace`: The namespace to deploy the cronjob to.
+- `schedule`: The schedule in Cron format.
+- `containers`: A list of containers to run in the cronjob.
+- `metadata`: Metadata to add to the cronjob pod.
+
+### `persistentVolume`
+
+- `enabled`: Enable or disable the persistent volume.
+- `name`: The name of the persistent volume.
+- `namespace`: The namespace of the persistent volume.
+- `labelType`: The type of the label.
+- `storage.className`: The storage class name.
+- `storage.capacity`: The capacity of the storage.
+- `accessModes`: The access modes.
+- `hostPath`: The host path.
+
+### `certificate`
+
+- `enabled`: Enable or disable the certificate.
+- `name`: The name of the certificate.
+- `namespace`: The namespace of the certificate.
+- `secretName`: The name of the secret to store the certificate in.
+- `issuerRef`: The name of the issuer.
+- `commonName`: The common name of the certificate.
+- `dnsNames`: A list of DNS names.
+
 
 
 ```

@@ -1,5 +1,3 @@
-
-
 # Helm Chart: [Flow Helm Chart]
 
 ## Overview
@@ -25,85 +23,81 @@ helm install [RELEASE_NAME] flow-helm-chart/flow-helm-chart
 
 This chart is configured using the `values.yaml` file. The following sections describe the available configuration options.
 
-### `serviceProperties`
-
-This section defines the default properties for all services deployed with this chart. These properties can be overridden in the specific service sections.
-
-- `name`: The name of the service.
-- `namespace`: The namespace to deploy the service to.
-- `enabled`: Whether the service is enabled or not.
-
-Example:
+### Complete `values.yaml` example
 
 ```yaml
+# Default service properties
 serviceProperties:
   name: "default-service"
   namespace: "default-namespace"
   enabled: true
-```
-
-### Overriding Default Properties
-
-You can override the default properties in the specific service sections. For example, to override the `name` and `namespace` for the `deployment`, you would configure the `deployment` section as follows:
-
-```yaml
-deployment:
-  name: "my-deployment"
-  namespace: "my-namespace"
-  # ... other deployment properties
-```
-
-If a property is not defined in the specific service section, the value from `serviceProperties` will be used.
-
-### Example `values.yaml`
-
-Here is an example of a `values.yaml` file that deploys a `fraud-service`:
-
-```yaml
-serviceProperties:
-  name: "fraud-service"
-  namespace: "flow"
-  enabled: true
 
 deployment:
+  name: fraud-service
+  enabled: false
+  namespace: flow
   replicaCount: 1
   restartPolicy: Always
   args: [ ]
   image:
-    repository: gfacratharidazwe.azurecr.io/backend/athari-fraud-service
+    # repository -- The image repository to pull from
+    repository: your-repo.acr.io
     tag: latest
     pullPolicy: Always
-  ports:
-    - name: http
-      containerPort: 8080
-      protocol: TCP
+  ports: { }
 
 service:
+  name: fraud-service
+  enabled: false
   type: ClusterIP
-  ports:
-    - port: 8080
-      name: http
-      targetPort: 8080
-      protocol: TCP
+  namespace: flow
+  ports: { }
+
+resources:
+  enabled: false
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
 
 configMap:
-  enabled: true
-  data:
-    DB.HOST: "g-pgsql-p-we.postgres.database.azure.com"
-    DB.PORT: "5432"
-    DB.NAME: "hydrate_aqm_fraud_p_db"
-    DB.USER: "hydrate"
-    DB.PASS: "ujy5azp.xrn3CMV0get"
-    KC.REALM: "hydrate"
-    KC.BASE_URL: "https://accounts.hydrate.net/auth"
-    EUREKA_ENABLED: "false"
-    EUREKA_ZONE_URL: ""
-    EUREKA_PREFER_IP: "false"
-    EUREKA_REGISTER: "false"
-    EUREKA_FETCH_REGISTRY: "false"
+  enabled: false
+  name: fraud-service
+  namespace: flow
+  data: { }
+
+secrets:
+  enabled: false
+  namespace: default
+  name: flow
+  data: { }
+
+certificate:
+  enabled: false
+  name: ''
+  namespace: ''
+  secretName: ''
+  issuerRef: ''
+  commonName: ''
+  dnsNames: { }
+
+gateway:
+  enabled: false
+  name: ''
+  namespace: ''
+  specSelector: ''
+  servers: { }
 
 virtualService:
-  enabled: true
+  enabled: false
+  name: fraud-service
   gateways:
     - api-gateway
   httpRoutes:
@@ -112,8 +106,6 @@ virtualService:
         allowHeaders:
           - authorization
           - content-type
-        allowOrigins:
-          exact: "*"
         allowMethods:
           - GET
           - PUT
@@ -125,41 +117,133 @@ virtualService:
             prefix: /v1/fraud
       route:
         - destination:
+            host: fraud-service.default.svc.cluster.local
             port:
               number: 8080
-  host: api.1flow.org
-```
+  tcpRoutes:
+    - match:
+        - port: 444
+      route:
+        - destination:
+            host: fraud-service.default.svc.cluster.local
+            port:
+              number: 444
+  namespace: flow
+  # host -- The host for the virtual service
+  host: api.your-domain.com
 
-### `cronJob`
+destinationRule:
+  enabled: false
+  name: ''
+  namespace: ''
+  host: ''
+  trafficPolicy:
+    loadBalancer:
+      simple: ''
+  subsets:
+    - name: ''
+      labels:
+        version: v3
+      trafficPolicy:
+        loadBalancer:
+          simple: ''
 
-- `enabled`: Enable or disable the cronjob.
-- `name`: The name of the cronjob.
-- `namespace`: The namespace to deploy the cronjob to.
-- `schedule`: The schedule in Cron format.
-- `containers`: A list of containers to run in the cronjob.
-- `metadata`: Metadata to add to the cronjob pod.
+cronJob:
+  enabled: false
+  name: ''
+  namespace: default
+  schedule: "59 23 28-31 * *"
+  containers: { }
+  metadata: { }
 
-### `persistentVolume`
+persistentVolume:
+  enabled: false
+  name: ''
+  namespace: ''
+  labelType: ''
+  storage:
+    className: 'default'
+    capacity: '10Gi'
+  accessModes:
+    - ReadWriteOnce
+  hostPath: '/mnt/data'
 
-- `enabled`: Enable or disable the persistent volume.
-- `name`: The name of the persistent volume.
-- `namespace`: The namespace of the persistent volume.
-- `labelType`: The type of the label.
-- `storage.className`: The storage class name.
-- `storage.capacity`: The capacity of the storage.
-- `accessModes`: The access modes.
-- `hostPath`: The host path.
+persistentVolumeClaim:
+  name: ''
+  namespace: ''
+  enabled: false
+  accessModes:
+    - ReadWriteOnce
+  storage: 16Gi
 
-### `certificate`
+argocd:
+  name: ' '
+  enabled: false
+  namespace: ' '
+  projectName: ''
+  sources: [ ]
+  sync:
+    automated:
+      prune: 'true'
+      selfHeal: 'true'
+    options:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - Validate=false
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+    retry:
+      limit: '2'
+      backoffDuration: '5s'
+      backOffMaxDuration: '3m0s'
+      backOffFactor: '2'
+  destination:
+    name: ''
+    namespace: ''
+    server: 'https://kubernetes.default.svc'
+  repository:
+    url: ''
+    path: ''
+    targetRevision: ''
+    chart: ''
+    valueFiles: { }
+  values: { }
 
-- `enabled`: Enable or disable the certificate.
-- `name`: The name of the certificate.
-- `namespace`: The namespace of the certificate.
-- `secretName`: The name of the secret to store the certificate in.
-- `issuerRef`: The name of the issuer.
-- `commonName`: The common name of the certificate.
-- `dnsNames`: A list of DNS names.
-
-
-
+hpa:
+  enabled: false
+  name: ''
+  namespace: ''
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
 ```

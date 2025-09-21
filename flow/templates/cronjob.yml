@@ -35,30 +35,22 @@ spec:
         spec:
           {{ if and .Values.cronJob.containers (not (empty .Values.cronJob.containers ) ) }}
           containers:
-            {{ range .Values.cronJob.containers }}
-            - name: {{ .name }}
-              image: {{ .image }}
-              imagePullPolicy: {{ .imagePullPolicy }}
-              {{ if or (.secretMap) (.configMap) }}
-              envFrom:
-              {{ if .secretMap }}
-                - secretRef:
-                    name: {{ .secretMap.name }}
-              {{ end }}
-
-              {{ if .configMap }}
-                - configMapRef:
-                    name: {{ .configMap.name }}
-              {{ end }}
-
-              {{ end }}
-              {{ if and .command (not (empty .command)) }}
-              command:
-                {{ range .command }}
-                - {{ . }}
-                {{ end }}
-              {{ end }}
-            {{ end }}
+                - name: {{ .Values.cronJob.name }}
+                  image: "{{ .Values.cronJob.image.repository }}:{{ .Values.cronJob.image.tag | default .Chart.AppVersion }}"
+                  imagePullPolicy: {{ .Values.cronJob.image.pullPolicy | default "Always" }}
+                  envFrom:
+                    - configMapRef:
+                        name: {{ $.Values.configMap.name }}
+                  {{- if .Values.cronJob.args }}
+                  args:
+                    {{- toYaml .Values.cronJob.args | nindent 20 }}
+                  {{- end }}
+                  {{- if .Values.cronJob.command }}
+                  command:
+                    {{- toYaml .Values.cronJob.command | nindent 20 }}
+                  {{- end }}
+                  resources:
+                    {{- toYaml .Values.cronJob.resources | nindent 20 }}
           {{end }}
           restartPolicy: {{ .Values.cronJob.restartPolicy }}
 {{- end }}

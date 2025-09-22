@@ -33,7 +33,6 @@ spec:
           {{- end }}
         {{- end }}
         spec:
-          {{ if and .Values.cronJob.containers (not (empty .Values.cronJob.containers ) ) }}
           containers:
                 - name: {{ .Values.cronJob.name }}
                   image: "{{ .Values.cronJob.image.repository }}:{{ .Values.cronJob.image.tag | default .Chart.AppVersion }}"
@@ -51,6 +50,5 @@ spec:
                   {{- end }}
                   resources:
                     {{- toYaml .Values.cronJob.resources | nindent 20 }}
-          {{end }}
           restartPolicy: {{ .Values.cronJob.restartPolicy }}
 {{- end }}

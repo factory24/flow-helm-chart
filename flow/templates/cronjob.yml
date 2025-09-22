@@ -28,9 +28,7 @@ spec:
       template:
         {{ if and .Values.cronJob.metadata (not (empty .Values.cronJob.metadata)) }}
         metadata:
-          {{ range $k, $v := .Values.cronJob.metadata }}
-          {{ $k }}: {{ $v }}
-          {{- end }}
+          {{- toYaml .Values.cronJob.metadata | nindent 10 }}
         {{- end }}
         spec:
           containers:

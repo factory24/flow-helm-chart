@@ -1,6 +1,6 @@
 {{- $name := coalesce .Values.persistentVolumeClaim.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.persistentVolumeClaim.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := coalesce .Values.persistentVolumeClaim.enabled .Values.serviceProperties.enabled -}}
+{{- $enabled := .Values.persistentVolumeClaim.enabled -}}
 
 {{ if $enabled }}
 apiVersion: v1

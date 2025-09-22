@@ -1,6 +1,6 @@
 {{- $name := coalesce .Values.deployment.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.deployment.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := coalesce .Values.autoscaling.enabled .Values.serviceProperties.enabled -}}
+{{- $enabled := .Values.autoscaling.enabled -}}
 
 {{ if $enabled }}
 apiVersion: autoscaling/v2

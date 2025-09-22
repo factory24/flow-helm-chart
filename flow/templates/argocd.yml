@@ -1,6 +1,6 @@
 {{- $name := coalesce .Values.argocd.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.argocd.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := coalesce .Values.argocd.enabled .Values.serviceProperties.enabled -}}
+{{- $enabled := .Values.argocd.enabled -}}
 
 {{ if $enabled }}
 apiVersion: argoproj.io/v1alpha1

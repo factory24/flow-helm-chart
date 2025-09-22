@@ -1,9 +1,9 @@
 {{- $name := coalesce .Values.destinationRule.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.destinationRule.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := coalesce .Values.destinationRule.enabled .Values.serviceProperties.enabled -}}
+{{- $enabled := .Values.destinationRule.enabled -}}
 
 {{ if $enabled }}
-apiVersion: networking.istio.io/v1
+apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: {{ $name }}

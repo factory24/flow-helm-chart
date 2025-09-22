@@ -2,7 +2,7 @@
 serviceProperties:
   name: "default-service"
   namespace: "default-namespace"
-  enabled: true
+  enabled: false
 
 deployment:
   name: fraud-service

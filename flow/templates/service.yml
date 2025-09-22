@@ -1,6 +1,6 @@
 {{- $name := coalesce .Values.service.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.service.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := coalesce .Values.service.enabled .Values.serviceProperties.enabled -}}
+{{- $enabled := .Values.service.enabled -}}
 
 {{ if $enabled }}
 apiVersion: v1

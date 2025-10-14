@@ -1,13 +1,11 @@
 # Default service properties
 serviceProperties:
   name: "default-service"
-  namespace: "default-namespace"
+  namespace: "flow"
   enabled: false
 
 deployment:
-  name: fraud-service
   enabled: false
-  namespace: flow
   replicaCount: 1
   restartPolicy: Always
   args: [ ]
@@ -19,10 +17,8 @@ deployment:
   ports: { }
 
 service:
-  name: fraud-service
   enabled: false
   type: ClusterIP
-  namespace: flow
   ports: { }
 
 resources:
@@ -41,8 +37,6 @@ autoscaling:
 
 configMap:
   enabled: false
-  name: fraud-service
-  namespace: flow
   data: { }
 
 secrets:
@@ -69,7 +63,6 @@ gateway:
 
 virtualService:
   enabled: false
-  name: fraud-service
   gateways:
     - api-gateway
   httpRoutes:
@@ -122,8 +115,6 @@ destinationRule:
 
 cronJob:
   enabled: false
-  name: ''
-  namespace: default
   schedule: "59 23 28-31 * *"
   containers: { }
   metadata: { }

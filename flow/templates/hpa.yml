@@ -22,4 +22,17 @@ spec:
         target:
           type: Utilization
           averageUtilization: 80
-  {{- end }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Pods
+      pods:
+        metric:
+          name: pod_network_io_bytes_per_second
+        target:
+          type: AverageValue
+          averageValue: 100M
+{{- end }}

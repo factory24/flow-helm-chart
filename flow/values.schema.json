@@ -16,7 +16,12 @@
             "repository": {
               "type": "string"
             },
-            "tag": {}
+            "tag": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "integer" }
+              ]
+            }
           }
         }
       }

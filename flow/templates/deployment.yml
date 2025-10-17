@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: {{ $name }}
-          image: {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
+          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           {{ if .Values.deployment.args }}
           args:

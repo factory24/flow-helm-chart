@@ -11,7 +11,8 @@ metadata:
 spec:
   secretName: {{ .Values.certificate.secretName }}
   issuerRef:
-    name: {{ .Values.certificate.issuerRef }}
+    name: {{ .Values.certificate.issuerRef.name }}
+    kind: {{ .Values.certificate.issuerRef.kind }}
   commonName: {{ .Values.certificate.commonName }}
   dnsNames:
     {{- range .Values.certificate.dnsNames }}

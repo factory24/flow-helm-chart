@@ -3,6 +3,16 @@ entries:
   flow-helm-chart:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-10-18T22:22:04.692399776Z"
+    description: A Helm chart for Kubernetes
+    digest: 3b470ac40992f52c0694c9317c48f87dfb4ec75a474b219f6c3881f6580b126f
+    name: flow-helm-chart
+    type: application
+    urls:
+    - https://github.com/factory24/flow-helm-chart/releases/download/flow-helm-chart-0.1.48/flow-helm-chart-0.1.48.tgz
+    version: 0.1.48
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-10-18T22:16:54.62285488Z"
     description: A Helm chart for Kubernetes
     digest: 75f208ce53633223afecf1e0cbc5bd5a98f20d86d968b19cdfde732baa8786e6
@@ -161,4 +171,4 @@ entries:
     urls:
     - flow-helm-chart-0.1.30.tgz
     version: 0.1.30
-generated: "2025-10-18T22:16:54.622985203Z"
+generated: "2025-10-18T22:22:04.692535409Z"

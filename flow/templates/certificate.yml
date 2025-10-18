@@ -11,8 +11,9 @@ metadata:
 spec:
   secretName: {{ .Values.certificate.secretName }}
   issuerRef:
-    name: {{ default "letsencrypt" (dig "certificate" "issuerRef" "name" .Values) }}
-    kind: {{ default "ClusterIssuer" (dig "certificate" "issuerRef" "kind" .Values) }}
+    {{- $issuerRef := default dict .Values.certificate.issuerRef }}
+    name: {{ default "letsencrypt" ($issuerRef.name | toString) }}
+    kind: {{ default "ClusterIssuer" ($issuerRef.kind | toString) }}
   commonName: {{ .Values.certificate.commonName }}
   dnsNames:
     {{- range .Values.certificate.dnsNames }}

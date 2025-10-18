@@ -50,7 +50,9 @@ certificate:
   name: ''
   namespace: ''
   secretName: ''
-  issuerRef: ''
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
   commonName: ''
   dnsNames: { }
 

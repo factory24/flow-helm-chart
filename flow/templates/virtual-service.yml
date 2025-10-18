@@ -50,7 +50,7 @@ spec:
       route:
       {{- range .route }}
         - destination:
-            host: {{ coalesce $.Values.deployment.name $.Values.serviceProperties.name }}.{{ coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace }}.svc.cluster.local
+            host: {{ default (printf "%s.%s.svc.cluster.local" (coalesce $.Values.deployment.name $.Values.serviceProperties.name) (coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace)) .destination.host }}
             port:
               number: {{ .destination.port.number }}
             {{ if .destination.subset }}
@@ -71,7 +71,7 @@ spec:
       route:
       {{- range .route }}
         - destination:
-            host: {{ coalesce $.Values.deployment.name $.Values.serviceProperties.name }}.{{ coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace }}.svc.cluster.local
+            host: {{ default (printf "%s.%s.svc.cluster.local" (coalesce $.Values.deployment.name $.Values.serviceProperties.name) (coalesce $.Values.deployment.namespace $.Values.serviceProperties.namespace)) .destination.host }}
             port:
               number: {{ .destination.port.number }}
       {{- end }}

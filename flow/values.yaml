@@ -41,14 +41,10 @@ configMap:
 
 secrets:
   enabled: false
-  namespace: default
-  name: flow
   data: { }
 
 certificate:
   enabled: false
-  name: ''
-  namespace: ''
   secretName: ''
   issuerRef:
     name: letsencrypt
@@ -67,12 +63,15 @@ virtualService:
   enabled: false
   gateways:
     - api-gateway
+  host: api.your-domain.com
   httpRoutes:
-    - name: fraud-service
+    - name: default-service
       corsPolicy:
         allowHeaders:
           - authorization
           - content-type
+        allowOrigins:
+          exact: "*"
         allowMethods:
           - GET
           - PUT
@@ -81,28 +80,18 @@ virtualService:
           - DELETE
       match:
         - uri:
-            prefix: /v1/fraud
+            prefix: /
       route:
         - destination:
-            host: fraud-service.default.svc.cluster.local
+            host: default-service.flow.svc.cluster.local
             port:
               number: 8080
-  tcpRoutes:
-    - match:
-        - port: 444
-      route:
-        - destination:
-            host: fraud-service.default.svc.cluster.local
-            port:
-              number: 444
-  namespace: flow
+
   # host -- The host for the virtual service
-  host: api.your-domain.com
+
 
 destinationRule:
   enabled: false
-  name: ''
-  namespace: ''
   host: ''
   trafficPolicy:
     loadBalancer:
@@ -123,8 +112,6 @@ cronJob:
 
 persistentVolume:
   enabled: false
-  name: ''
-  namespace: ''
   labelType: ''
   storage:
     className: 'default'
@@ -134,8 +121,6 @@ persistentVolume:
   hostPath: '/mnt/data'
 
 persistentVolumeClaim:
-  name: ''
-  namespace: ''
   enabled: false
   accessModes:
     - ReadWriteOnce
@@ -177,8 +162,6 @@ argocd:
 
 hpa:
   enabled: false
-  name: ''
-  namespace: ''
   minReplicas: 1
   maxReplicas: 10
   metrics:

@@ -87,7 +87,6 @@ virtualService:
             port:
               number: 8080
 
-  # host -- The host for the virtual service
 
 
 destinationRule:
@@ -96,6 +95,8 @@ destinationRule:
   trafficPolicy:
     loadBalancer:
       simple: ''
+    tls:
+      mode: ''
   subsets:
     - name: ''
       labels:

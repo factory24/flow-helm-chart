@@ -13,6 +13,10 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: {{ .Values.destinationRule.trafficPolicy.loadBalancer.simple | upper }}
+    {{- if .Values.destinationRule.trafficPolicy.tls }}
+    tls:
+      mode: {{ .Values.destinationRule.trafficPolicy.tls.mode | upper }}
+    {{- end }}
     {{ if and .Values.destinationRule.portLevelSettings (not (empty .Values.destinationRule.portLevelSettings )) }}
     portLevelSettings:
       {{ range .Values.destinationRule.portLevelSettings }}

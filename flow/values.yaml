@@ -78,6 +78,7 @@ virtualService:
           - POST
           - PATCH
           - DELETE
+          - OPTIONS
       match:
         - uri:
             prefix: /

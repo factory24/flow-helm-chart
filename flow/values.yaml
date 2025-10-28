@@ -109,8 +109,20 @@ destinationRule:
 cronJob:
   enabled: false
   schedule: "59 23 28-31 * *"
-  containers: { }
+  restartPolicy: OnFailure
+  containers: [ ]
+  volumes: [ ]
   metadata: { }
+
+sidecar:
+  enabled: false
+  name: ""
+  namespace: ""
+  egress:
+    - hosts:
+        - "./*"
+        - "default/*"
+        - "flow/*"
 
 persistentVolume:
   enabled: false

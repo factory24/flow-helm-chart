@@ -1,0 +1,16 @@
+{{- $name := coalesce .Values.sidecar.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.sidecar.namespace .Values.serviceProperties.namespace -}}
+{{- $enabled := .Values.sidecar.enabled -}}
+
+{{ if $enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: {{ $name }}
+  namespace: {{ $namespace }}
+spec:
+  {{- if .Values.sidecar.egress }}
+  egress:
+  {{- toYaml .Values.sidecar.egress | nindent 4 }}
+  {{- end }}
+{{- end }}

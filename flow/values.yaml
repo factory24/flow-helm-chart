@@ -67,18 +67,18 @@ virtualService:
   httpRoutes:
     - name: default-service
       corsPolicy:
+        allowOrigins:
+          - regex: ".*"
+          - exact: "*"
         allowHeaders:
           - authorization
           - content-type
-        allowOrigins:
-          exact: "*"
         allowMethods:
           - GET
           - PUT
           - POST
           - PATCH
           - DELETE
-          - OPTIONS
       match:
         - uri:
             prefix: /

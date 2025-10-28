@@ -21,21 +21,34 @@ spec:
   http:
   {{- range .Values.virtualService.httpRoutes }}
     - name: {{ .name }}
-      {{ if and .corsPolicy (not (empty .corsPolicy)) }}
+      {{ if .corsPolicy }}
       corsPolicy:
+        {{ if .corsPolicy.allowOrigins }}
         allowOrigins:
-          - exact: "*"
-        {{ if and .corsPolicy.allowMethods (not (empty .corsPolicy.allowMethods)) }}
+        {{- range .corsPolicy.allowOrigins }}
+          {{- if .exact }}
+          - exact: {{ .exact | quote }}
+          {{- else if .prefix }}
+          - prefix: {{ .prefix | quote }}
+          {{- else if .regex }}
+          - regex: {{ .regex | quote }}
+          {{- end }}
+        {{- end }}
+        {{- else }}
+        allowOrigins:
+          - regex: ".*"
+        {{- end }}
+        {{ if .corsPolicy.allowMethods }}
         allowMethods:
-          {{ range .corsPolicy.allowMethods }}
+          {{- range .corsPolicy.allowMethods }}
           - {{ . | upper }}
-          {{ end }}
+          {{- end }}
         {{ end }}
-        {{ if and .corsPolicy.allowHeaders (not (empty .corsPolicy.allowHeaders)) }}
+        {{ if .corsPolicy.allowHeaders }}
         allowHeaders:
-          {{ range .corsPolicy.allowHeaders }}
-          - {{ . | title }}
-          {{ end }}
+          {{- range .corsPolicy.allowHeaders }}
+          - {{ . }}
+          {{- end }}
         {{ end }}
       {{ end }}
       match:

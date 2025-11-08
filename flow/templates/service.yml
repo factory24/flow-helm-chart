@@ -10,7 +10,11 @@ metadata:
   namespace: {{ $namespace }}
 spec:
   selector:
+  {{- if .Values.service.selector }}
+{{ toYaml .Values.service.selector | nindent 4 }}
+  {{- else }}
     app: {{ coalesce .Values.deployment.name .Values.serviceProperties.name }}
+  {{- end }}
   ports:
     {{ range .Values.service.ports }}
     - port: {{ .port }}

@@ -120,9 +120,9 @@ sidecar:
   namespace: ""
   egress:
     - hosts:
-        - "./*"
-        - "default/*"
-        - "flow/*"
+      - "./*"
+      - "default/*"
+      - "flow/*"
 
 persistentVolume:
   enabled: false

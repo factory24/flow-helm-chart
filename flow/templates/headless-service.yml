@@ -1,0 +1,28 @@
+{{- if .Values.headlessService }}
+{{- if .Values.headlessService.enabled }}
+{{- $name := coalesce .Values.headlessService.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.headlessService.namespace .Values.serviceProperties.namespace -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-headless
+  namespace: {{ $namespace }}
+  labels:
+    app: {{ $name }}
+spec:
+  clusterIP: None
+  selector:
+  {{- if .Values.headlessService.selector }}
+{{ toYaml .Values.headlessService.selector | nindent 4 }}
+  {{- else }}
+    app: {{ coalesce .Values.deployment.name .Values.serviceProperties.name }}
+  {{- end }}
+  ports:
+    {{ range .Values.headlessService.ports }}
+    - port: {{ .port }}
+      name: {{ .name }}
+      targetPort: {{ coalesce .targetPort .port }}
+      protocol: {{ default "TCP" .protocol }}
+    {{- end }}
+{{- end }}
+{{- end }}

@@ -31,13 +31,25 @@ spec:
             - {{ . | quote }}
             {{- end }}
           {{ end }}
-          {{ if .Values.resources.enabled }}
+          {{- if .Values.deployment.ports }}
           ports:
             {{- range .Values.deployment.ports }}
             - name: {{ .name }}
               containerPort: {{ .containerPort }}
-              protocol: {{ .protocol }}
+              protocol: {{ default "TCP" .protocol }}
             {{- end }}
+          {{- end }}
+          {{- if .Values.deployment.livenessProbe }}
+          livenessProbe:
+{{ toYaml .Values.deployment.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.readinessProbe }}
+          readinessProbe:
+{{ toYaml .Values.deployment.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.startupProbe }}
+          startupProbe:
+{{ toYaml .Values.deployment.startupProbe | nindent 12 }}
           {{- end }}
 
           {{ if .Values.resources.enabled }}

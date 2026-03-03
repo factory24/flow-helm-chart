@@ -1,6 +1,6 @@
 {{- $name := coalesce .Values.deployment.name .Values.serviceProperties.name -}}
 {{- $namespace := coalesce .Values.deployment.namespace .Values.serviceProperties.namespace -}}
-{{- $enabled := .Values.autoscaling.enabled -}}
+{{- $enabled := coalesce .Values.hpa.enabled .Values.autoscaling.enabled false -}}
 
 {{ if $enabled }}
 apiVersion: autoscaling/v2
@@ -13,9 +13,12 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ $name }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ coalesce .Values.hpa.minReplicas .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ coalesce .Values.hpa.maxReplicas .Values.autoscaling.maxReplicas }}
   metrics:
+{{- if .Values.hpa.metrics }}
+{{ toYaml .Values.hpa.metrics | indent 4 }}
+{{- else }}
     - type: Resource
       resource:
         name: cpu
@@ -28,11 +31,5 @@ spec:
         target:
           type: Utilization
           averageUtilization: 80
-    - type: Pods
-      pods:
-        metric:
-          name: pod_network_io_bytes_per_second
-        target:
-          type: AverageValue
-          averageValue: 100M
+{{- end }}
 {{- end }}

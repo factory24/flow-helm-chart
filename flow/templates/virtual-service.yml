@@ -24,7 +24,7 @@ spec:
             prefix: /.well-known/acme-challenge/
       route:
         - destination:
-            host: acme-challenge-responder.istio-system.svc.cluster.local
+            host: cert-manager-solver-global.istio-system.svc.cluster.local
             port:
               number: 8089
   {{- range .Values.virtualService.httpRoutes }}

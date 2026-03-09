@@ -19,6 +19,14 @@ spec:
   {{- end }}
   {{ if and .Values.virtualService.httpRoutes (not (empty .Values.virtualService.httpRoutes)) }}
   http:
+    - match:
+        - uri:
+            prefix: /.well-known/acme-challenge/
+      route:
+        - destination:
+            host: acme-challenge-responder.istio-system.svc.cluster.local
+            port:
+              number: 8089
   {{- range .Values.virtualService.httpRoutes }}
     - name: {{ .name }}
       {{ if .corsPolicy }}

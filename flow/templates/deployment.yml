@@ -20,6 +20,12 @@ spec:
       name: {{ $name }}
       labels:
         app: {{ $name }}
+      {{- if .Values.metrics.enabled }}
+      annotations:
+        prometheus.io/scrape: {{ .Values.metrics.scrape | quote }}
+        prometheus.io/port: {{ .Values.metrics.port | quote }}
+        prometheus.io/path: {{ .Values.metrics.path | quote }}
+      {{- end }}
     spec:
       containers:
         - name: {{ $name }}
@@ -52,14 +58,26 @@ spec:
 {{ toYaml .Values.deployment.startupProbe | nindent 12 }}
           {{- end }}
 
-          {{ if .Values.resources.enabled }}
+          {{- if or .Values.resources.enabled .Values.resources.requests .Values.resources.limits }}
           resources:
+            {{- if .Values.resources.limits }}
             limits:
+              {{- if .Values.resources.limits.cpu }}
               cpu: {{ .Values.resources.limits.cpu }}
+              {{- end }}
+              {{- if .Values.resources.limits.memory }}
               memory: {{ .Values.resources.limits.memory }}
+              {{- end }}
+            {{- end }}
+            {{- if .Values.resources.requests }}
             requests:
+              {{- if .Values.resources.requests.cpu }}
               cpu: {{ .Values.resources.requests.cpu }}
+              {{- end }}
+              {{- if .Values.resources.requests.memory }}
               memory: {{ .Values.resources.requests.memory }}
+              {{- end }}
+            {{- end }}
           {{- end }}
           {{ if or (.Values.configMap.enabled) (.Values.secrets.enabled) }}
           envFrom:

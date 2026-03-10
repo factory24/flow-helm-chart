@@ -22,7 +22,7 @@ service:
   ports: { }
 
 resources:
-  enabled: false
+  enabled: true
   limits:
     cpu: 100m
     memory: 128Mi
@@ -31,7 +31,7 @@ resources:
     memory: 128Mi
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 10
 
@@ -175,7 +175,7 @@ argocd:
   values: { }
 
 hpa:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 10
   metrics:

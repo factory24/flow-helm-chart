@@ -20,16 +20,28 @@ spec:
       name: {{ $name }}
       labels:
         app: {{ $name }}
-      {{- if .Values.metrics.enabled }}
+      {{- if or .Values.metrics.enabled .Values.configMap.enabled .Values.secrets.enabled }}
       annotations:
+        {{- if .Values.metrics.enabled }}
         prometheus.io/scrape: {{ .Values.metrics.scrape | quote }}
         prometheus.io/port: {{ .Values.metrics.port | quote }}
         prometheus.io/path: {{ .Values.metrics.path | quote }}
+        {{- end }}
+        {{- if .Values.configMap.enabled }}
+        checksum/config: {{ toYaml .Values.configMap.data | sha256sum }}
+        {{- end }}
+        {{- if .Values.secrets.enabled }}
+        checksum/secret: {{ toYaml .Values.secrets.data | sha256sum }}
+        {{- end }}
       {{- end }}
     spec:
+      {{- if .Values.deployment.initContainers }}
+      initContainers:
+        {{- toYaml .Values.deployment.initContainers | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ $name }}
-          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag | toString }}"
+          image: "{{ .Values.deployment.image.repository }}:{{ coalesce .Values.deployment.image.tag .Chart.AppVersion | toString }}"
           imagePullPolicy: {{ .Values.deployment.image.pullPolicy }}
           {{ if .Values.deployment.args }}
           args:
@@ -58,37 +70,36 @@ spec:
 {{ toYaml .Values.deployment.startupProbe | nindent 12 }}
           {{- end }}
 
-          {{- if or .Values.resources.enabled .Values.resources.requests .Values.resources.limits }}
+          {{- if .Values.resources }}
           resources:
-            {{- if .Values.resources.limits }}
-            limits:
-              {{- if .Values.resources.limits.cpu }}
-              cpu: {{ .Values.resources.limits.cpu }}
-              {{- end }}
-              {{- if .Values.resources.limits.memory }}
-              memory: {{ .Values.resources.limits.memory }}
-              {{- end }}
-            {{- end }}
-            {{- if .Values.resources.requests }}
-            requests:
-              {{- if .Values.resources.requests.cpu }}
-              cpu: {{ .Values.resources.requests.cpu }}
-              {{- end }}
-              {{- if .Values.resources.requests.memory }}
-              memory: {{ .Values.resources.requests.memory }}
-              {{- end }}
-            {{- end }}
+            {{- toYaml (omit .Values.resources "enabled") | nindent 12 }}
           {{- end }}
-          {{ if or (.Values.configMap.enabled) (.Values.secrets.enabled) }}
+          {{- if .Values.deployment.env }}
+          env:
+            {{- toYaml .Values.deployment.env | nindent 12 }}
+          {{- end }}
+          {{- if or .Values.configMap.enabled .Values.secrets.enabled }}
           envFrom:
-          {{ if .Values.configMap.enabled}}
+            {{- if .Values.configMap.enabled }}
             - configMapRef:
                 name: {{ coalesce .Values.configMap.name .Values.serviceProperties.name }}
-            {{ if .Values.secrets.enabled }}
+            {{- end }}
+            {{- if .Values.secrets.enabled }}
             - secretRef:
                 name: {{ coalesce .Values.secrets.name .Values.serviceProperties.name }}
             {{- end }}
           {{- end }}
-          {{- end }}
-      restartPolicy: {{ .Values.deployment.restartPolicy}}
+      restartPolicy: {{ .Values.deployment.restartPolicy }}
+      {{- if .Values.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.deployment.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.deployment.affinity }}
+      affinity:
+        {{- toYaml .Values.deployment.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml .Values.deployment.tolerations | nindent 8 }}
+      {{- end }}
 {{ end }}

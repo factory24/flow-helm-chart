@@ -59,10 +59,20 @@ spec:
           {{- end }}
         {{ end }}
       {{ end }}
+      {{- if .match }}
       match:
       {{- range .match }}
+        {{- if and .uri .port }}
         - uri:
             prefix: {{ .uri.prefix }}
+          port: {{ .port }}
+        {{- else if .uri }}
+        - uri:
+            prefix: {{ .uri.prefix }}
+        {{- else if .port }}
+        - port: {{ .port }}
+        {{- end }}
+      {{- end }}
       {{- end }}
       {{- if .rewrite }}
       rewrite:

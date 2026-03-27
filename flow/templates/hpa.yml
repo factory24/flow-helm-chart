@@ -10,9 +10,9 @@ metadata:
   namespace: {{ $namespace }}
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: {{ $name }}
+    apiVersion: {{ .Values.hpa.targetApiVersion | default "apps/v1" }}
+    kind: {{ .Values.hpa.targetKind | default "Deployment" }}
+    name: {{ .Values.hpa.targetName | default $name }}
   minReplicas: {{ coalesce .Values.hpa.minReplicas .Values.autoscaling.minReplicas }}
   maxReplicas: {{ coalesce .Values.hpa.maxReplicas .Values.autoscaling.maxReplicas }}
   metrics:

@@ -8,13 +8,19 @@ deployment:
   enabled: false
   replicaCount: 1
   restartPolicy: Always
-  args: [ ]
+  args: []
+  env: []
+  initContainers: []
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  podAnnotations: {}
   image:
     # repository -- The image repository to pull from
     repository: your-repo.acr.io
     tag: latest
     pullPolicy: Always
-  ports: { }
+  ports: {}
 
 service:
   enabled: false
@@ -110,9 +116,20 @@ cronJob:
   enabled: false
   schedule: "59 23 28-31 * *"
   restartPolicy: OnFailure
-  containers: [ ]
-  volumes: [ ]
-  metadata: { }
+  image:
+    repository: your-repo.acr.io
+    tag: latest
+    pullPolicy: Always
+  env: []
+  args: []
+  command: []
+  initContainers: []
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  volumes: []
+  resources: {}
+  metadata: {}
 
 sidecar:
   enabled: false

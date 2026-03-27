@@ -26,31 +26,72 @@ spec:
       backoffLimit: {{ .Values.cronJob.backoffLimit | default 5 }}
       backoffLimitPerIndex: {{ .Values.cronJob.backoffLimitPerIndex }}
       template:
-        {{ if and .Values.cronJob.metadata (not (empty .Values.cronJob.metadata)) }}
+        {{- if or .Values.cronJob.metadata .Values.configMap.enabled .Values.secrets.enabled }}
         metadata:
+          {{- if .Values.cronJob.metadata }}
           {{- toYaml .Values.cronJob.metadata | nindent 10 }}
+          {{- end }}
+          {{- if or .Values.configMap.enabled .Values.secrets.enabled }}
+          annotations:
+            {{- if .Values.configMap.enabled }}
+            checksum/config: {{ toYaml .Values.configMap.data | sha256sum }}
+            {{- end }}
+            {{- if .Values.secrets.enabled }}
+            checksum/secret: {{ toYaml .Values.secrets.data | sha256sum }}
+            {{- end }}
+          {{- end }}
         {{- end }}
         spec:
           {{- if .Values.cronJob.volumes }}
           volumes:
             {{- toYaml .Values.cronJob.volumes | nindent 12 }}
           {{- end }}
+          {{- if .Values.cronJob.initContainers }}
+          initContainers:
+            {{- toYaml .Values.cronJob.initContainers | nindent 12 }}
+          {{- end }}
           containers:
-                - name: {{ $name }}
-                  image: "{{ .Values.cronJob.image.repository }}:{{ .Values.cronJob.image.tag | default .Chart.AppVersion }}"
-                  imagePullPolicy: {{ .Values.cronJob.image.pullPolicy | default "Always" }}
-                  envFrom:
-                    - configMapRef:
-                        name: {{ coalesce .Values.configMap.name .Values.serviceProperties.name }}
-                  {{- if .Values.cronJob.args }}
-                  args:
-                    {{- toYaml .Values.cronJob.args | nindent 20 }}
-                  {{- end }}
-                  {{- if .Values.cronJob.command }}
-                  command:
-                    {{- toYaml .Values.cronJob.command | nindent 20 }}
-                  {{- end }}
-                  resources:
-                    {{- toYaml .Values.cronJob.resources | nindent 20 }}
-          restartPolicy: {{ .Values.cronJob.restartPolicy }}
+            - name: {{ $name }}
+              image: "{{ .Values.cronJob.image.repository }}:{{ coalesce .Values.cronJob.image.tag .Chart.AppVersion }}"
+              imagePullPolicy: {{ coalesce .Values.cronJob.image.pullPolicy "Always" }}
+              {{- if .Values.cronJob.env }}
+              env:
+                {{- toYaml .Values.cronJob.env | nindent 16 }}
+              {{- end }}
+              {{- if or .Values.configMap.enabled .Values.secrets.enabled }}
+              envFrom:
+                {{- if .Values.configMap.enabled }}
+                - configMapRef:
+                    name: {{ coalesce .Values.configMap.name .Values.serviceProperties.name }}
+                {{- end }}
+                {{- if .Values.secrets.enabled }}
+                - secretRef:
+                    name: {{ coalesce .Values.secrets.name .Values.serviceProperties.name }}
+                {{- end }}
+              {{- end }}
+              {{- if .Values.cronJob.args }}
+              args:
+                {{- toYaml .Values.cronJob.args | nindent 16 }}
+              {{- end }}
+              {{- if .Values.cronJob.command }}
+              command:
+                {{- toYaml .Values.cronJob.command | nindent 16 }}
+              {{- end }}
+              {{- if .Values.cronJob.resources }}
+              resources:
+                {{- toYaml (omit .Values.cronJob.resources "enabled") | nindent 16 }}
+              {{- end }}
+          restartPolicy: {{ coalesce .Values.cronJob.restartPolicy "OnFailure" }}
+          {{- if .Values.cronJob.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.cronJob.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.cronJob.affinity }}
+          affinity:
+            {{- toYaml .Values.cronJob.affinity | nindent 12 }}
+          {{- end }}
+          {{- if .Values.cronJob.tolerations }}
+          tolerations:
+            {{- toYaml .Values.cronJob.tolerations | nindent 12 }}
+          {{- end }}
 {{- end }}

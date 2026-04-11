@@ -11,6 +11,8 @@ deployment:
   args: []
   env: []
   initContainers: []
+  volumes: []
+  volumeMounts: []
   nodeSelector: {}
   affinity: {}
   tolerations: []

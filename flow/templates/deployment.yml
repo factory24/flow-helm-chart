@@ -89,6 +89,14 @@ spec:
                 name: {{ coalesce .Values.secrets.name .Values.serviceProperties.name }}
             {{- end }}
           {{- end }}
+          {{- if .Values.deployment.volumeMounts }}
+          volumeMounts:
+            {{- toYaml .Values.deployment.volumeMounts | nindent 12 }}
+          {{- end }}
+      {{- if .Values.deployment.volumes }}
+      volumes:
+        {{- toYaml .Values.deployment.volumes | nindent 8 }}
+      {{- end }}
       restartPolicy: {{ .Values.deployment.restartPolicy }}
       {{- if .Values.deployment.nodeSelector }}
       nodeSelector:

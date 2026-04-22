@@ -39,7 +39,7 @@ resources:
     memory: 128Mi
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 10
 
@@ -201,7 +201,7 @@ metrics:
   path: "/metrics"
 
 hpa:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 10
   metrics:

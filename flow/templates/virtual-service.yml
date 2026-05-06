@@ -28,6 +28,11 @@ spec:
             host: cert-manager-solver-global.istio-system.svc.cluster.local
             port:
               number: 8089
+    - name: http-https-redirect
+      match:
+        - port: 80
+      redirect:
+        scheme: https
   {{- range .Values.virtualService.httpRoutes }}
     - name: {{ .name }}
       {{ if .corsPolicy }}

@@ -29,9 +29,6 @@ spec:
         {{ if .tls.credentialName }}
         credentialName: {{ .tls.credentialName }}
         {{ end }}
-        {{ if .tls.httpsRedirect }}
-        httpsRedirect: {{ .tls.httpsRedirect }}
-        {{- end }}
       {{- end -}}
     {{- end -}}
 {{ end }}

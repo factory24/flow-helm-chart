@@ -19,7 +19,8 @@ spec:
   {{- end }}
   {{ if and .Values.virtualService.httpRoutes (not (empty .Values.virtualService.httpRoutes)) }}
   http:
-    - match:
+    - name: acme-challenge
+      match:
         - uri:
             prefix: /.well-known/acme-challenge/
       route:

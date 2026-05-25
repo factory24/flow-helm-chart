@@ -72,6 +72,9 @@ virtualService:
   gateways:
     - api-gateway
   host: api.your-domain.com
+  # hosts:
+  #   - api.your-domain.com
+  #   - other.your-domain.com
   httpRoutes:
     - name: default-service
       corsPolicy:

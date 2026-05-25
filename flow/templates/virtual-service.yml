@@ -10,8 +10,14 @@ metadata:
   namespace: {{ $namespace }}
 spec:
   hosts:
+    {{- if .Values.virtualService.hosts }}
+    {{- range .Values.virtualService.hosts }}
+    - {{ . }}
+    {{- end }}
+    {{- else }}
     - {{ .Values.virtualService.host }}
-      {{ if .Values.virtualService.gateways }}
+    {{- end }}
+    {{- if .Values.virtualService.gateways }}
   gateways:
     {{- range .Values.virtualService.gateways }}
     - {{ . }}

@@ -71,10 +71,17 @@ virtualService:
   enabled: false
   gateways:
     - api-gateway
-  host: api.your-domain.com
+  # hosts (preferred) — list one or more hostnames this VirtualService serves.
+  # Use multiple hosts when a service must be reachable under more than one domain
+  # (e.g. api.everyflow.org for the main API gateway AND docs.everyflow.org for a
+  # docs gateway).  All listed gateways are applied to all listed hosts.
   # hosts:
   #   - api.your-domain.com
   #   - other.your-domain.com
+  #
+  # host (legacy, single value) — still supported for backward compatibility when
+  # only one hostname is needed.  Ignored when `hosts` is set.
+  host: api.your-domain.com
   httpRoutes:
     - name: default-service
       corsPolicy:

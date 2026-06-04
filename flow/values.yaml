@@ -8,6 +8,11 @@ deployment:
   enabled: false
   replicaCount: 1
   restartPolicy: Always
+  # Rolling update: kill old pod first, then start new (maxSurge=0).
+  # Prevents Pending deadlock on CPU-constrained clusters.
+  maxUnavailable: 1
+  maxSurge: 0
+  revisionHistoryLimit: 2
   args: []
   env: []
   initContainers: []

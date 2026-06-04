@@ -12,6 +12,17 @@ metadata:
     app: {{ $name }}
 spec:
   replicas: {{ .Values.deployment.replicaCount }}
+  # Keep only 2 old ReplicaSets for rollback — prevents stale RS accumulation.
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit | default 2 }}
+  # Kill the old pod BEFORE starting the new one (maxSurge=0).
+  # Default RollingUpdate (maxSurge=25%) tries to schedule the new pod alongside
+  # the old one. On a CPU-constrained cluster this deadlocks: new pod stays Pending,
+  # old pod never dies because it waits for the new one to be Ready.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.deployment.maxUnavailable | default 1 }}
+      maxSurge: {{ .Values.deployment.maxSurge | default 0 }}
   selector:
     matchLabels:
       app: {{ $name }}

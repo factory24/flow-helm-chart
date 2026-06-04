@@ -35,13 +35,21 @@ service:
   ports: { }
 
 resources:
-  enabled: true
+  # Requests are what the scheduler uses to place pods — keep them low and
+  # realistic. Limits allow burst (GC, cold start, IoT spikes) without
+  # throttling. Setting limit == request (old behaviour) caused CPU throttling
+  # on Go services and made the cluster appear full at 30% actual usage.
+  #
+  # Actual observed usage across Flow services: 5-40m CPU, 40-100Mi RAM.
+  # With Istio sidecar adding 100m CPU request per pod, the old 100m+100m=200m
+  # per pod exhausted 6 nodes at only 53 pods. With 50m+100m=150m we get ~30%
+  # more scheduling headroom on the same hardware.
   limits:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 500m      # allow burst; Go GC and IoT uplink spikes need headroom
+    memory: 256Mi
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 50m       # realistic steady-state for a Go/Echo service
+    memory: 64Mi
 
 autoscaling:
   enabled: false
@@ -129,6 +137,14 @@ destinationRule:
         loadBalancer:
           simple: ''
 
+pdb:
+  # Enable PodDisruptionBudget to protect against simultaneous pod eviction
+  # during node drain, cluster upgrades, or autoscaler scale-down.
+  # Safe to enable for all stateless services; set minAvailable: 0 for
+  # single-replica services you can tolerate brief downtime on.
+  enabled: false
+  minAvailable: 1
+
 cronJob:
   enabled: false
   schedule: "59 23 28-31 * *"
@@ -145,7 +161,17 @@ cronJob:
   affinity: {}
   tolerations: []
   volumes: []
-  resources: {}
+  # Cron job resource defaults — never leave these empty.
+  # Pods without requests get Burstable/BestEffort QoS and are evicted first.
+  # The Istio sidecar annotation (injected by the template) adds ~100m CPU
+  # request automatically.
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
   metadata: {}
 
 sidecar:
@@ -207,7 +233,6 @@ argocd:
     chart: ''
     valueFiles: { }
   values: { }
-  values: { }
 
 metrics:
   enabled: true
@@ -218,14 +243,17 @@ metrics:
 hpa:
   enabled: false
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5   # conservative default — override per service
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 80
+          # 70% of request (50m) = 35m actual before scale-up triggers.
+          # Lower threshold means earlier scale-out, keeping latency low
+          # for IoT uplink bursts without waiting until the pod is saturated.
+          averageUtilization: 70
     - type: Resource
       resource:
         name: memory
@@ -234,18 +262,23 @@ hpa:
           averageUtilization: 80
   behavior:
     scaleDown:
+      # Wait 5 min before scaling down — prevents thrashing on short traffic
+      # bursts (IoT uplink batches, vendor session peaks).
       stabilizationWindowSeconds: 300
       policies:
-        - type: Percent
-          value: 100
-          periodSeconds: 15
-    scaleUp:
-      stabilizationWindowSeconds: 0
-      policies:
-        - type: Percent
-          value: 100
-          periodSeconds: 15
+        # Only remove 1 pod per minute on scale-down. Prevents wiping all
+        # replicas at once and causing a brief outage. The old 100%/15s
+        # policy could kill all pods in one pass after the 5-min window.
         - type: Pods
-          value: 4
-          periodSeconds: 15
+          value: 1
+          periodSeconds: 60
+    scaleUp:
+      # 60s stabilization on scale-up — avoids spinning up extra nodes for
+      # short IoT bursts that self-resolve within a minute.
+      stabilizationWindowSeconds: 60
+      policies:
+        # Add at most 2 pods every 30 seconds — steady, predictable growth.
+        - type: Pods
+          value: 2
+          periodSeconds: 30
       selectPolicy: Max

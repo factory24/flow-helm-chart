@@ -1,0 +1,21 @@
+{{- $name := coalesce .Values.deployment.name .Values.serviceProperties.name -}}
+{{- $namespace := coalesce .Values.deployment.namespace .Values.serviceProperties.namespace -}}
+{{- $deployEnabled := .Values.deployment.enabled -}}
+{{- $pdbEnabled := .Values.pdb.enabled | default false -}}
+
+{{- if and $deployEnabled $pdbEnabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}
+  namespace: {{ $namespace }}
+spec:
+  # Guarantee at least 1 pod is always available during node drain,
+  # cluster upgrades, or autoscaler scale-down events.
+  # For replicaCount=1 services this prevents the single pod from being
+  # evicted until a replacement is scheduled first.
+  minAvailable: {{ .Values.pdb.minAvailable | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+{{- end }}

@@ -46,6 +46,11 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      # Disable legacy Docker-link service env vars (<SVC>_SERVICE_HOST, <SVC>_PORT=tcp://ip:port).
+      # A Service named "redis" otherwise injects REDIS_PORT=tcp://ip:6379, which collides with the
+      # app's own REDIS_PORT and breaks redis dialing ("too many colons in address"). Services get
+      # their config from Infisical/configmap, not these auto vars.
+      enableServiceLinks: {{ .Values.deployment.enableServiceLinks | default false }}
       {{- if .Values.deployment.initContainers }}
       initContainers:
         {{- toYaml .Values.deployment.initContainers | nindent 8 }}

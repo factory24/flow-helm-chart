@@ -53,6 +53,8 @@ spec:
               holdApplicationUntilProxyStarts: true
               proxyTerminationGracePeriodSeconds: 5
         spec:
+          # Disable legacy service-link env vars (see deployment.yml) to avoid REDIS_PORT collision.
+          enableServiceLinks: {{ .Values.deployment.enableServiceLinks | default false }}
           {{- if .Values.cronJob.volumes }}
           volumes:
             {{- toYaml .Values.cronJob.volumes | nindent 12 }}

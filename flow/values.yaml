@@ -8,6 +8,10 @@ deployment:
   enabled: false
   replicaCount: 1
   restartPolicy: Always
+  # Disable k8s legacy service-link env vars (<SVC>_SERVICE_HOST, <SVC>_PORT=tcp://ip:port).
+  # Prevents a Service named "redis" from injecting REDIS_PORT=tcp://... which collides with the
+  # app's REDIS_PORT ("too many colons in address"). Set true only if a service needs those vars.
+  enableServiceLinks: false
   # Rolling update: kill old pod first, then start new (maxSurge=0).
   # Prevents Pending deadlock on CPU-constrained clusters.
   maxUnavailable: 1

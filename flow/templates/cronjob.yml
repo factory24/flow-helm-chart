@@ -33,25 +33,31 @@ spec:
       {{- end }}
       template:
         metadata:
-          {{- if .Values.cronJob.metadata }}
-          {{- toYaml .Values.cronJob.metadata | nindent 10 }}
+          {{- with .Values.cronJob.metadata.labels }}
+          labels:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           annotations:
+            # Cron pods must NOT get an Istio sidecar. The istio-proxy is a
+            # long-running process that never exits on its own, so once the job
+            # container Completes the pod stays Running forever, the Job never
+            # finishes, and concurrencyPolicy: Forbid blocks every subsequent run
+            # (elastic-search-worker was stuck 9d, device-alert-worker 25d+).
+            # The old `proxy.istio.io/config: holdApplicationUntilProxyStarts` here
+            # was a STARTUP setting and could not fix a shutdown hang, so it is gone.
+            # Mesh mTLS is PERMISSIVE (no PeerAuthentication) and workers authenticate
+            # to other services via SYSTEM_TOKEN (JWT), so plaintext egress without a
+            # sidecar is safe. Override per-service with cronJob.sidecarInject: "true".
+            sidecar.istio.io/inject: {{ .Values.cronJob.sidecarInject | default "false" | quote }}
             {{- if .Values.configMap.enabled }}
             checksum/config: {{ toYaml .Values.configMap.data | sha256sum }}
             {{- end }}
             {{- if .Values.secrets.enabled }}
             checksum/secret: {{ toYaml .Values.secrets.data | sha256sum }}
             {{- end }}
-            # Fix: Istio sidecar never exits after the job container finishes,
-            # causing the pod to stay Running forever. ConcurrencyPolicy=Forbid
-            # then blocks all subsequent runs (device-alert-worker was stuck 73+ days).
-            # holdApplicationUntilProxyStarts ensures the sidecar is ready before
-            # the job starts; proxyTerminationGracePeriodSeconds gives it time to
-            # flush and exit cleanly when the job pod terminates.
-            proxy.istio.io/config: |
-              holdApplicationUntilProxyStarts: true
-              proxyTerminationGracePeriodSeconds: 5
+            {{- with .Values.cronJob.metadata.annotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           # Disable legacy service-link env vars (see deployment.yml) to avoid REDIS_PORT collision.
           enableServiceLinks: {{ .Values.deployment.enableServiceLinks | default false }}

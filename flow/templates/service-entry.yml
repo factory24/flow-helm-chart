@@ -1,0 +1,33 @@
+{{- /*
+ServiceEntry: makes a host OUTSIDE the mesh addressable from inside it, so a
+VirtualService can route to it. Off by default and strictly additive — a release
+of the chart renders nothing new for any app that does not set it.
+
+It exists so a route to an external destination can live in the same ArgoCD app
+as its VirtualService. Applied by hand, the entry sits outside GitOps: the route
+that depends on it is managed, the thing it depends on is not, and a cluster
+rebuild restores the first and silently drops the second (2026-10-01, the 4G
+meter route to Akoben).
+*/ -}}
+{{- if .Values.serviceEntry.enabled }}
+{{- $ns := coalesce .Values.serviceEntry.namespace .Values.serviceProperties.namespace }}
+{{- range .Values.serviceEntry.entries }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: {{ required "serviceEntry.entries[].name is required" .name }}
+  namespace: {{ $ns }}
+spec:
+  hosts:
+    {{- toYaml (required "serviceEntry.entries[].hosts is required" .hosts) | nindent 4 }}
+  location: {{ .location | default "MESH_EXTERNAL" }}
+  resolution: {{ .resolution | default "STATIC" }}
+  ports:
+    {{- toYaml (required "serviceEntry.entries[].ports is required" .ports) | nindent 4 }}
+  {{- with .endpoints }}
+  endpoints:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

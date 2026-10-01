@@ -84,6 +84,17 @@ gateway:
   specSelector: ''
   servers: { }
 
+serviceEntry:
+  # Off by default. Set it on the app whose VirtualService routes to a host
+  # outside the mesh, so the route and what it depends on are managed together.
+  enabled: false
+  namespace: ""
+  entries: []
+  # - name: akoben-cellular-prod
+  #   hosts: [akoben-cellular-prod.external]
+  #   ports: [{ number: 9001, name: tcp-meters, protocol: TCP }]
+  #   endpoints: [{ address: 46.202.143.131 }]
+
 virtualService:
   enabled: false
   gateways:
